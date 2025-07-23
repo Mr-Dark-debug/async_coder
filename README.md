@@ -30,7 +30,7 @@ Async Coder offers specialized modes for every stage of your development cycle:
   _Example:_  
   ```bash
   async-coder --debug my_app.py
-````
+``
 
 * **Ask Mode**
   Ask anything about your codebase or a specific file. Async Coder fetches relevant context, explains concepts, and provides real-world examples.
@@ -136,11 +136,11 @@ async-coder --async
 
 ---
 
-## **Roadmap (v1 → v2)**
+## **Roadmap (v0.1.0)**
 
-* [x] **Core modes (Debug, Ask, Documentation, Architect)**
-* [x] **Async Mode (autonomous chaining)**
-* [x] **PR creation and review**
+* [ ] **Core modes (Debug, Ask, Documentation, Architect)**
+* [ ] **Async Mode (autonomous chaining)**
+* [ ] **PR creation and review**
 * [ ] **CI/CD integrations (GitHub Actions, GitLab)**
 * [ ] **Containerized DevOps Mode (Docker + Kubernetes)**
 * [ ] **GUI Dashboard for Non-CLI Users**
