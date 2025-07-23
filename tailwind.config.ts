@@ -8,13 +8,13 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        montserrat: ["var(--font-montserrat)"],
-        roboto: ["var(--font-roboto)"],
-        poppins: ["var(--font-poppins)"],
+        sans: ["var(--font-inter)", "sans-serif"],
       },
       colors: {
-        syntaxiaRed: '#f34e34',
-        syntaxiaDarkRed: '#c0392b', // A darker shade for text or hover
+        primary: "#1E3A8A",
+        accent: "#2563EB",
+        background: "#F9FAFB",
+        text: "#111827",
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",

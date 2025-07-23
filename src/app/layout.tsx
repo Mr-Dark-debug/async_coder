@@ -1,27 +1,16 @@
 import type { Metadata } from "next";
-import { Montserrat, Roboto, Poppins } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
+import Providers from "./providers";
 
-const montserrat = Montserrat({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-montserrat",
-});
-
-const roboto = Roboto({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"], // Include needed weights
-  variable: "--font-roboto",
-});
-
-const poppins = Poppins({
-  subsets: ["latin"],
-  weight: ["400", "600", "700"], // Include needed weights
-  variable: "--font-poppins",
+  variable: "--font-inter",
 });
 
 export const metadata: Metadata = {
-  title: "Syntaxia - Your Asynchronous Coding Assistant",
-  description: "Automate your coding tasks and focus on what matters most.",
+  title: "Async Coder - The last AI assistant you'll ever need for coding.",
+  description: "Open-source, multi-engine AI assistant with autonomous coding modes. Build, debug, document, and review PRs—all in one CLI tool.",
 };
 
 export default function RootLayout({
@@ -32,9 +21,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${montserrat.variable} ${roboto.variable} ${poppins.variable} antialiased`}
+        className={`${inter.variable} font-sans antialiased`}
       >
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
