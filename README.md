@@ -1,36 +1,174 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Async Coder  
+**_The last AI assistant you'll ever need for coding._**
 
-## Getting Started
+Async Coder is an **open-source, end-to-end AI coding assistant** built to empower developers with full control, unmatched flexibility, and an **autonomous development pipeline**. Think of it as your **developer co-pilot on steroids** — capable of debugging, writing, refactoring, documenting, testing, creating PRs, and even reviewing pull requests, all while learning from every mistake and continuously improving.
 
-First, run the development server:
+Whether you want to use **Claude Code, Gemini CLI, Aider, or our in-house AI**, Async Coder lets you **plug in your own API keys**, switch between engines, or simply run in **Async Mode**, where it autonomously handles your coding tasks **from idea to PR merge**.
+
+---
+
+## **Why Async Coder?**
+
+Modern coding assistants are either closed-box SaaS tools or limited single-engine CLI apps. **Async Coder is different:**
+
+- **Open-Source Core** – Complete transparency, self-host forever, and contribute to its evolution.  
+- **End-to-End Autonomy** – With **Async Mode**, it can design, build, debug, test, document, and review code independently.  
+- **Multi-Engine Support** – Use Claude, Gemini CLI, Aider, or our in-house AI. **Your choice. Your rules.**  
+- **Self-Learning Agent** – Learns from bugs, fixes, and past projects for better accuracy over time.  
+- **Developer-Centric Design** – Write test cases, perform code reviews, generate documentation, and manage PRs directly from your CLI.  
+- **Future-Ready** – Architected to integrate with modern CI/CD pipelines and GitHub Actions.
+
+---
+
+## **Key Features**
+
+### **1. Multi-Mode AI Assistance**
+Async Coder offers specialized modes for every stage of your development cycle:
+
+- **Debug Mode**  
+  Automatically detects bugs, generates fixes, and adds **intelligent logging** for better runtime insights.  
+  _Example:_  
+  ```bash
+  async-coder --debug my_app.py
+````
+
+* **Ask Mode**
+  Ask anything about your codebase or a specific file. Async Coder fetches relevant context, explains concepts, and provides real-world examples.
+  *Example:*
+
+  ```bash
+  async-coder --ask "How do I optimize this API route?"
+  ```
+
+* **Documentation Mode**
+  Generates and updates project documentation, inline code comments, and API references.
+  *Example:*
+
+  ```bash
+  async-coder --doc ./src/
+  ```
+
+* **Architect Planner Mode**
+  Designs scalable architectures, proposes best practices, and even outlines your technical roadmap.
+  *Example:*
+
+  ```bash
+  async-coder --architect "Build a SaaS platform with microservices"
+  ```
+
+* **PR Review Mode**
+  Creates new PRs or reviews incoming ones, offering **detailed review comments** and **automated test suggestions**.
+  *Example:*
+
+  ```bash
+  async-coder --pr-review my-feature-branch
+  ```
+
+* **Async Mode (Autonomous)**
+  The most advanced mode. Async Coder autonomously **chains all other modes** to handle your project end-to-end:
+
+  * Fetches relevant tech docs and frameworks from the internet.
+  * Codes features and tests.
+  * Fixes bugs and saves learnings for future usage.
+  * Creates PRs, reviews others' PRs, and provides actionable comments.
+
+  *Example:*
+
+  ```bash
+  async-coder --async
+  ```
+
+---
+
+## **In-Built Development Tools**
+
+Async Coder doesn’t just stop at coding. It comes with **full-stack development intelligence:**
+
+* **Automated Test Generation** – Unit tests, integration tests, and coverage reports.
+* **Intelligent Logging** – Inserts optimized logging for easier debugging.
+* **Code Review Assistant** – Detects anti-patterns and suggests clean refactors.
+* **Continuous Learning** – Stores bug-fix patterns and reusable templates.
+
+---
+
+## **Supported AI Backends**
+
+* **Claude Code** (Anthropic).
+* **Gemini CLI** (Google DeepMind).
+* **Aider** (Open-Source CLI AI).
+* **Async In-House AI** (custom LLMs optimized for coding).
+* **Bring Your Own API (BYO-AI)** – Plug in **OpenAI, Mistral, or LLaMA APIs** effortlessly.
+
+---
+
+## **Quick Start**
+
+### **1. Installation**
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Clone the repository
+git clone https://github.com/your-org/async-coder.git
+cd async-coder
+
+# Install dependencies
+pip install -r requirements.txt
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### **2. Configure AI Backends**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create a `.env` file and add your API keys:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```env
+CLAUDE_API_KEY=your_key_here
+GEMINI_API_KEY=your_key_here
+AIDER_KEY=your_key_here
+```
 
-## Learn More
+### **3. Run Async Coder**
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+# Launch interactive mode
+async-coder --ask "Generate a FastAPI boilerplate"
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Or run full autonomous mode
+async-coder --async
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## **Roadmap (v1 → v2)**
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+* [x] **Core modes (Debug, Ask, Documentation, Architect)**
+* [x] **Async Mode (autonomous chaining)**
+* [x] **PR creation and review**
+* [ ] **CI/CD integrations (GitHub Actions, GitLab)**
+* [ ] **Containerized DevOps Mode (Docker + Kubernetes)**
+* [ ] **GUI Dashboard for Non-CLI Users**
+* [ ] **AI Model Plugins (easily add new backends)**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## **Community & Open Source**
+
+We’re building Async Coder **with and for the open-source community.**
+
+* **Contribute** – Submit PRs, bug reports, and feature requests.
+* **Join Discussions** – Share ideas, suggest integrations, or help shape the roadmap.
+* **Plugins & Extensions** – Build your own AI mode or backend support.
+
+**Repo Links:**
+
+* **Issues:** [GitHub Issues](https://github.com/your-org/async-coder/issues)
+* **Discussions:** [GitHub Discussions](https://github.com/your-org/async-coder/discussions)
+
+---
+
+## **License**
+
+Async Coder is licensed under the **Apache 2.0 License**, giving you **freedom to self-host and modify** while encouraging community contributions.
+
+---
+
+## **Tagline**
+
+***"Async Coder – The last AI assistant you'll ever need for coding."***
