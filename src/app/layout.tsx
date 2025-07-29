@@ -1,11 +1,11 @@
 import React from 'react'
-import { ThemeProvider } from './components/ThemeProvider'
-import { Header } from './components/Header'
-import { HeroSection } from './components/HeroSection'
-import { FeaturesSection } from './components/FeaturesSection'
-import { LiveDiffDemo } from './components/LiveDiffDemo'
-import { PricingSection } from './components/PricingSection'
-import { Footer } from './components/Footer'
+import { ThemeProvider } from '../app/components/ThemeProvider'
+import { Header } from '../app/components/Header'
+import { HeroSection } from '../app/components/HeroSection'
+import { FeaturesSection } from '../app/components/FeaturesSection'
+import { LiveDiffDemo } from '../app/components/LiveDiffDemo'
+import { PricingSection } from '../app/components/PricingSection'
+import { Footer } from '../app/components/Footer'
 export function App() {
   return (
     <ThemeProvider>
