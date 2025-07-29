@@ -1,7 +1,29 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { Play, Pause, RotateCw } from 'lucide-react'
+// Simple syntax highlighting function
+const highlightCode = (code: string) => {
+  // Replace keywords
+  let highlighted = code
+    .replace(
+      /(function|return|const|let|if|for|throw|new)/g,
+      '<span class="token keyword">$1</span>',
+    )
+    .replace(/(\w+)(?=\s*\()/g, '<span class="token function">$1</span>')
+    .replace(/(\/\*\*[\s\S]*?\*\/)/g, '<span class="token comment">$1</span>')
+    .replace(/\/\/(.*)/g, '<span class="token comment">//$1</span>')
+    .replace(
+      /(['"])(?:(?=(\\?))\\2.)*?\\1/g,
+      '<span class="token string">$&</span>',
+    )
+    .replace(/(\d+)/g, '<span class="token number">$1</span>')
+    .replace(
+      /(!==|===|=>|=|<|>|\+|\/|\*|-|,|\(|\)|\{|\}|;)/g,
+      '<span class="token punctuation">$1</span>',
+    )
+  return highlighted
+}
 export function LiveDiffDemo() {
-  const [isPlaying, setIsPlaying] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(true) // Auto-play
   const [progress, setProgress] = useState(0)
   const [currentStep, setCurrentStep] = useState(0)
   const [mousePosition, setMousePosition] = useState({
@@ -167,6 +189,8 @@ function calculateTotal(items, discount = 0) {
     }
   }
   useEffect(() => {
+    // Auto-start on mount
+    setIsPlaying(true)
     if (isPlaying) {
       lastTimeRef.current = null
       animationRef.current = requestAnimationFrame(animate)
@@ -180,7 +204,7 @@ function calculateTotal(items, discount = 0) {
     }
   }, [isPlaying])
   const resetDemo = () => {
-    setIsPlaying(false)
+    setIsPlaying(true) // Auto-play on reset
     setProgress(0)
     setCurrentStep(0)
     if (animationRef.current) {
@@ -217,9 +241,12 @@ function calculateTotal(items, discount = 0) {
       )
     } else {
       return (
-        <pre className="p-4 overflow-auto font-mono text-sm">
-          {steps[currentStep].code}
-        </pre>
+        <pre
+          className="p-4 overflow-auto font-mono text-sm h-full"
+          dangerouslySetInnerHTML={{
+            __html: highlightCode(steps[currentStep].code),
+          }}
+        />
       )
     }
   }
@@ -245,7 +272,7 @@ function calculateTotal(items, discount = 0) {
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="bg-white dark:bg-background border border-blue-100/30 dark:border-border rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
-              <div className="bg-blue-50/80 dark:bg-secondary/50 px-4 py-2 border-b border-blue-100/30 dark:border-border flex items-center">
+              <div className="bg-blue-50/80 dark:bg-secondary/50 px-4 py-3 border-b border-blue-100/30 dark:border-border flex items-center">
                 <div className="flex space-x-2">
                   <div className="w-3 h-3 rounded-full bg-red-500"></div>
                   <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
@@ -253,12 +280,15 @@ function calculateTotal(items, discount = 0) {
                 </div>
                 <div className="ml-4 text-sm font-medium">Original Code</div>
               </div>
-              <pre className="p-4 overflow-auto font-mono text-sm h-80">
-                {oldCode}
-              </pre>
+              <pre
+                className="p-4 overflow-auto font-mono text-sm h-80"
+                dangerouslySetInnerHTML={{
+                  __html: highlightCode(oldCode),
+                }}
+              />
             </div>
             <div className="bg-white dark:bg-background border border-blue-100/30 dark:border-border rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
-              <div className="bg-blue-50/80 dark:bg-secondary/50 px-4 py-2 border-b border-blue-100/30 dark:border-border flex items-center">
+              <div className="bg-blue-50/80 dark:bg-secondary/50 px-4 py-3 border-b border-blue-100/30 dark:border-border flex items-center">
                 <div className="flex space-x-2">
                   <div className="w-3 h-3 rounded-full bg-red-500"></div>
                   <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
