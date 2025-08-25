@@ -3,6 +3,18 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  
+  /* shadcn/ui variables */
+  --primary: #171717;
+  --primary-foreground: #fafafa;
+  --secondary: #f5f5f5;
+  --secondary-foreground: #171717;
+  --destructive: #ef4444;
+  --destructive-foreground: #fafafa;
+  --accent: #f5f5f5;
+  --accent-foreground: #171717;
+  --ring: #171717;
+  --input: #e5e7eb;
 }
 
 @theme inline {
@@ -16,6 +28,18 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    
+    /* shadcn/ui dark mode variables */
+    --primary: #fafafa;
+    --primary-foreground: #0a0a0a;
+    --secondary: #262626;
+    --secondary-foreground: #fafafa;
+    --destructive: #dc2626;
+    --destructive-foreground: #fafafa;
+    --accent: #262626;
+    --accent-foreground: #fafafa;
+    --ring: #fafafa;
+    --input: #374151;
   }
 }
 
