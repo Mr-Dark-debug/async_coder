@@ -13,7 +13,13 @@ import {
     ArrowUpIcon,
     Paperclip,
     PlusIcon,
+    Bug,
+    HelpCircle,
+    FileText,
+    Layers,
+    GitPullRequest,
 } from "lucide-react";
+import actionConfig from "@/json/action-config.json";
 
 interface UseAutoResizeTextareaProps {
     minHeight: number;
@@ -88,10 +94,31 @@ export function VercelV0Chat() {
         }
     };
 
+    const handleActionClick = (actionId: string) => {
+        const action = actionConfig.actionButtons.find(btn => btn.id === actionId);
+        if (action) {
+            setValue(action.defaultPrompt);
+            // Adjust height after setting the value
+            setTimeout(() => adjustHeight(), 0);
+        }
+    };
+
+    // Icon mapping for dynamic icon rendering
+    const getIcon = (iconName: string) => {
+        const iconMap: Record<string, React.ReactNode> = {
+            Bug: <Bug className="w-4 h-4" />,
+            HelpCircle: <HelpCircle className="w-4 h-4" />,
+            FileText: <FileText className="w-4 h-4" />,
+            Layers: <Layers className="w-4 h-4" />,
+            GitPullRequest: <GitPullRequest className="w-4 h-4" />,
+        };
+        return iconMap[iconName] || <HelpCircle className="w-4 h-4" />;
+    };
+
     return (
         <div className="flex flex-col items-center w-full max-w-4xl mx-auto p-4 space-y-8">
             <h1 className="text-4xl font-bold text-black dark:text-white">
-                What can I help you ship?
+                What can I help you build today?
             </h1>
 
             <div className="w-full">
@@ -105,7 +132,7 @@ export function VercelV0Chat() {
                                 adjustHeight();
                             }}
                             onKeyDown={handleKeyDown}
-                            placeholder="Ask v0 a question..."
+                            placeholder="Ask Async Coder anything about your code..."
                             className={cn(
                                 "w-full px-4 py-3",
                                 "resize-none",
@@ -166,27 +193,16 @@ export function VercelV0Chat() {
                     </div>
                 </div>
 
-                <div className="flex items-center justify-center gap-3 mt-4">
-                    <ActionButton
-                        icon={<ImageIcon className="w-4 h-4" />}
-                        label="Clone a Screenshot"
-                    />
-                    <ActionButton
-                        icon={<Figma className="w-4 h-4" />}
-                        label="Import from Figma"
-                    />
-                    <ActionButton
-                        icon={<FileUp className="w-4 h-4" />}
-                        label="Upload a Project"
-                    />
-                    <ActionButton
-                        icon={<MonitorIcon className="w-4 h-4" />}
-                        label="Landing Page"
-                    />
-                    <ActionButton
-                        icon={<CircleUserRound className="w-4 h-4" />}
-                        label="Sign Up Form"
-                    />
+                <div className="flex items-center justify-center gap-3 mt-4 flex-wrap">
+                    {actionConfig.actionButtons.map((action) => (
+                        <ActionButton
+                            key={action.id}
+                            icon={getIcon(action.icon)}
+                            label={action.label}
+                            onClick={() => handleActionClick(action.id)}
+                            description={action.description}
+                        />
+                    ))}
                 </div>
             </div>
         </div>
@@ -196,16 +212,26 @@ export function VercelV0Chat() {
 interface ActionButtonProps {
     icon: React.ReactNode;
     label: string;
+    onClick?: () => void;
+    description?: string;
 }
 
-function ActionButton({ icon, label }: ActionButtonProps) {
+function ActionButton({ icon, label, onClick, description }: ActionButtonProps) {
     return (
         <button
             type="button"
-            className="flex items-center gap-2 px-4 py-2 bg-neutral-900 hover:bg-neutral-800 rounded-full border border-neutral-800 text-neutral-400 hover:text-white transition-colors"
+            onClick={onClick}
+            title={description}
+            className="flex items-center gap-2 px-4 py-2 bg-neutral-900 hover:bg-neutral-800 rounded-full border border-neutral-800 text-neutral-400 hover:text-white transition-colors group relative"
         >
             {icon}
             <span className="text-xs">{label}</span>
+            {description && (
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                    {description}
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black"></div>
+                </div>
+            )}
         </button>
     );
 }

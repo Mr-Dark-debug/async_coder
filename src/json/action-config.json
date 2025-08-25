@@ -1,0 +1,89 @@
+{
+  "actionButtons": [
+    {
+      "id": "debug_mode",
+      "label": "Debug Code",
+      "icon": "Bug",
+      "defaultPrompt": "I need help debugging my code. Can you analyze the following code and help me identify and fix any issues?",
+      "description": "Automatically detects bugs, generates fixes, and adds intelligent logging"
+    },
+    {
+      "id": "ask_mode",
+      "label": "Ask Question",
+      "icon": "HelpCircle",
+      "defaultPrompt": "I have a question about my codebase. Can you help me understand how to implement or optimize the following?",
+      "description": "Ask anything about your codebase with context-aware analysis"
+    },
+    {
+      "id": "documentation_mode",
+      "label": "Generate Docs",
+      "icon": "FileText",
+      "defaultPrompt": "Please generate comprehensive documentation for my code including inline comments, API references, and usage examples.",
+      "description": "Generates and updates project documentation and inline comments"
+    },
+    {
+      "id": "architect_mode",
+      "label": "Architecture Planning",
+      "icon": "Layers",
+      "defaultPrompt": "I need help designing a scalable architecture for my project. Can you help me plan the technical roadmap and best practices?",
+      "description": "Designs scalable architectures and technical roadmaps"
+    },
+    {
+      "id": "pr_review_mode",
+      "label": "PR Review",
+      "icon": "GitPullRequest",
+      "defaultPrompt": "Please review my code changes and provide detailed feedback with suggestions for improvements and automated test recommendations.",
+      "description": "Creates and reviews pull requests with detailed comments"
+    }
+  ],
+  "quickStartPrompts": [
+    {
+      "category": "Project Setup",
+      "prompts": [
+        "Generate a FastAPI boilerplate with authentication",
+        "Create a Next.js project with TypeScript and Tailwind CSS",
+        "Set up a microservices architecture with Docker"
+      ]
+    },
+    {
+      "category": "Code Generation",
+      "prompts": [
+        "Create unit tests for my existing functions",
+        "Generate API endpoints for CRUD operations",
+        "Build a React component with proper TypeScript types"
+      ]
+    },
+    {
+      "category": "Debugging & Optimization",
+      "prompts": [
+        "Optimize my database queries for better performance",
+        "Find and fix memory leaks in my application",
+        "Add proper error handling and logging"
+      ]
+    }
+  ],
+  "aiBackends": [
+    {
+      "name": "Claude Code",
+      "provider": "Anthropic",
+      "description": "Advanced reasoning and code generation"
+    },
+    {
+      "name": "Gemini CLI",
+      "provider": "Google DeepMind",
+      "description": "Multimodal AI with code understanding"
+    },
+    {
+      "name": "Aider",
+      "provider": "Open Source",
+      "description": "Open-source CLI AI assistant"
+    },
+    {
+      "name": "Async In-House AI",
+      "provider": "Async Coder",
+      "description": "Custom LLMs optimized for coding"
+    }
+  ],
+  "version": "1.0.0",
+  "lastUpdated": "2025-01-25"
+}
