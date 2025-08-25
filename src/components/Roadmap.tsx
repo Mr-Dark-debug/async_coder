@@ -85,7 +85,7 @@ export default function Roadmap() {
   };
 
   return (
-    <section className="py-20 bg-transparent">
+    <section id="roadmap" className="py-20 bg-transparent">
       <div className="max-w-6xl mx-auto px-6">
         {/* Section Header */}
         <div className="text-center mb-16">
