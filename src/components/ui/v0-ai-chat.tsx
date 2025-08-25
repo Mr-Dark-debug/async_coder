@@ -18,8 +18,11 @@ import {
     FileText,
     Layers,
     GitPullRequest,
+    ChevronDown,
+    GitBranch,
 } from "lucide-react";
 import actionConfig from "@/json/action-config.json";
+import sidebarData from "@/json/sidebar-data.json";
 
 interface UseAutoResizeTextareaProps {
     minHeight: number;
@@ -79,10 +82,23 @@ function useAutoResizeTextarea({
 
 export function VercelV0Chat() {
     const [value, setValue] = useState("");
+    const [selectedRepo, setSelectedRepo] = useState<string | null>(null);
+    const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
+    const [showRepoDropdown, setShowRepoDropdown] = useState(false);
+    const [showBranchDropdown, setShowBranchDropdown] = useState(false);
+    
     const { textareaRef, adjustHeight } = useAutoResizeTextarea({
         minHeight: 60,
         maxHeight: 200,
     });
+
+    // Mock branches for selected repository
+    const mockBranches = [
+        { name: "main", isDefault: true },
+        { name: "develop", isDefault: false },
+        { name: "feature/auth-system", isDefault: false },
+        { name: "hotfix/bug-fix", isDefault: false },
+    ];
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === "Enter" && !e.shiftKey) {
@@ -93,6 +109,22 @@ export function VercelV0Chat() {
             }
         }
     };
+
+    // Close dropdowns when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            const target = event.target as HTMLElement;
+            if (!target.closest('.dropdown-container')) {
+                setShowRepoDropdown(false);
+                setShowBranchDropdown(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     const handleActionClick = (actionId: string) => {
         const action = actionConfig.actionButtons.find(btn => btn.id === actionId);
@@ -163,13 +195,81 @@ export function VercelV0Chat() {
                             </button>
                         </div>
                         <div className="flex items-center gap-2">
-                            <button
-                                type="button"
-                                className="px-2 py-1 rounded-lg text-sm text-zinc-400 transition-colors border border-dashed border-zinc-700 hover:border-zinc-600 hover:bg-zinc-800 flex items-center justify-between gap-1"
-                            >
-                                <PlusIcon className="w-4 h-4" />
-                                Project
-                            </button>
+                            {/* Repository Selector */}
+                            <div className="relative dropdown-container">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setShowRepoDropdown(!showRepoDropdown);
+                                        setShowBranchDropdown(false);
+                                    }}
+                                    className="px-2 py-1 rounded-lg text-sm text-zinc-400 transition-colors border border-dashed border-zinc-700 hover:border-zinc-600 hover:bg-zinc-800 flex items-center justify-between gap-1"
+                                >
+                                    <PlusIcon className="w-4 h-4" />
+                                    {selectedRepo ? sidebarData.codebases.find(r => r.id === selectedRepo)?.name : "Repo"}
+                                    <ChevronDown className="w-3 h-3" />
+                                </button>
+                                
+                                {showRepoDropdown && (
+                                    <div className="absolute bottom-full left-0 mb-2 w-64 bg-neutral-800 border border-neutral-700 rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto">
+                                        {sidebarData.codebases.map((repo) => (
+                                            <button
+                                                key={repo.id}
+                                                type="button"
+                                                onClick={() => {
+                                                    setSelectedRepo(repo.id);
+                                                    setSelectedBranch(null);
+                                                    setShowRepoDropdown(false);
+                                                }}
+                                                className="w-full text-left px-3 py-2 text-sm text-zinc-300 hover:bg-neutral-700 transition-colors flex items-center gap-2"
+                                            >
+                                                <span className="text-xs text-zinc-500">{repo.owner}/</span>
+                                                <span>{repo.name}</span>
+                                                {repo.isPrivate && <span className="text-xs text-zinc-500">(private)</span>}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Branch Selector - Only show if repo is selected */}
+                            {selectedRepo && (
+                                <div className="relative dropdown-container">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setShowBranchDropdown(!showBranchDropdown);
+                                            setShowRepoDropdown(false);
+                                        }}
+                                        className="px-2 py-1 rounded-lg text-sm text-zinc-400 transition-colors border border-dashed border-zinc-700 hover:border-zinc-600 hover:bg-zinc-800 flex items-center justify-between gap-1"
+                                    >
+                                        <GitBranch className="w-4 h-4" />
+                                        {selectedBranch || "main"}
+                                        <ChevronDown className="w-3 h-3" />
+                                    </button>
+                                    
+                                    {showBranchDropdown && (
+                                        <div className="absolute bottom-full left-0 mb-2 w-48 bg-neutral-800 border border-neutral-700 rounded-lg shadow-lg z-50">
+                                            {mockBranches.map((branch) => (
+                                                <button
+                                                    key={branch.name}
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setSelectedBranch(branch.name);
+                                                        setShowBranchDropdown(false);
+                                                    }}
+                                                    className="w-full text-left px-3 py-2 text-sm text-zinc-300 hover:bg-neutral-700 transition-colors flex items-center gap-2"
+                                                >
+                                                    <GitBranch className="w-3 h-3" />
+                                                    <span>{branch.name}</span>
+                                                    {branch.isDefault && <span className="text-xs text-zinc-500">(default)</span>}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                            
                             <button
                                 type="button"
                                 className={cn(

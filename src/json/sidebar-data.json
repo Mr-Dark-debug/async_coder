@@ -1,0 +1,128 @@
+{
+  "recentTasks": [
+    {
+      "id": "task_1",
+      "title": "Debug authentication middleware",
+      "type": "debug",
+      "timestamp": "2024-01-25T10:30:00Z",
+      "status": "completed"
+    },
+    {
+      "id": "task_2", 
+      "title": "Generate API documentation",
+      "type": "documentation",
+      "timestamp": "2024-01-25T09:15:00Z",
+      "status": "in_progress"
+    },
+    {
+      "id": "task_3",
+      "title": "Review pull request #127",
+      "type": "pr_review",
+      "timestamp": "2024-01-24T16:45:00Z",
+      "status": "completed"
+    },
+    {
+      "id": "task_4",
+      "title": "Architect microservices design",
+      "type": "architecture",
+      "timestamp": "2024-01-24T14:20:00Z",
+      "status": "completed"
+    }
+  ],
+  "codebases": [
+    {
+      "id": "async_coder",
+      "name": "async_coder",
+      "owner": "pschoudhary-dot",
+      "fullName": "pschoudhary-dot/async_coder",
+      "description": "The last AI assistant you'll ever need for coding",
+      "language": "TypeScript",
+      "isPrivate": false,
+      "hasNotifications": true,
+      "notificationCount": 1
+    },
+    {
+      "id": "image_router",
+      "name": "image-router",
+      "owner": "pschoudhary-dot",
+      "fullName": "pschoudhary-dot/image-router", 
+      "description": "Smart image routing and optimization service",
+      "language": "Python",
+      "isPrivate": false,
+      "hasNotifications": true,
+      "notificationCount": 1
+    },
+    {
+      "id": "opencode",
+      "name": "opencode",
+      "owner": "pschoudhary-dot",
+      "fullName": "pschoudhary-dot/opencode",
+      "description": "Open source code collaboration platform",
+      "language": "JavaScript",
+      "isPrivate": false,
+      "hasNotifications": true,
+      "notificationCount": 1
+    },
+    {
+      "id": "weekend_gateway",
+      "name": "Weekend-Gateway",
+      "owner": "pschoudhary-dot",
+      "fullName": "pschoudhary-dot/Weekend-Gateway",
+      "description": "Weekend project management and gateway",
+      "language": "Go",
+      "isPrivate": false,
+      "hasNotifications": false
+    },
+    {
+      "id": "echogen_ai",
+      "name": "EchoGen.ai",
+      "owner": "Mr-Dark-debug",
+      "fullName": "Mr-Dark-debug/EchoGen.ai",
+      "description": "AI-powered echo generation and analysis",
+      "language": "Python", 
+      "isPrivate": true,
+      "hasNotifications": false
+    },
+    {
+      "id": "kidlytic_center",
+      "name": "kidlytic-center",
+      "owner": "Mr-Dark-debug",
+      "fullName": "Mr-Dark-debug/kidlytic-center",
+      "description": "Analytics center for child development",
+      "language": "React",
+      "isPrivate": true,
+      "hasNotifications": false
+    },
+    {
+      "id": "smart_email_assistant",
+      "name": "smart-email-assistant",
+      "owner": "Mr-Dark-debug",
+      "fullName": "Mr-Dark-debug/smart-email-assistant",
+      "description": "AI-powered smart email management",
+      "language": "TypeScript",
+      "isPrivate": true,
+      "hasNotifications": false
+    }
+  ],
+  "dailyTaskLimit": {
+    "current": 0,
+    "maximum": 15
+  },
+  "footerLinks": [
+    {
+      "name": "Docs",
+      "icon": "FileText",
+      "url": "/docs"
+    },
+    {
+      "name": "Discord",
+      "icon": "MessageCircle", 
+      "url": "https://discord.gg/asynccoder"
+    },
+    {
+      "name": "Twitter",
+      "icon": "Twitter",
+      "url": "https://twitter.com/asynccoder"
+    }
+  ]
+}
