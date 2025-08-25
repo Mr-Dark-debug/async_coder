@@ -29,61 +29,24 @@ export function HeroSection() {
     return (
         <>
             <HeroHeader />
-            <main className="overflow-hidden">
-                <div
-                    aria-hidden
-                    className="z-[2] absolute inset-0 pointer-events-none isolate opacity-50 contain-strict hidden lg:block">
-                    <div className="w-[35rem] h-[80rem] -translate-y-[350px] absolute left-0 top-0 -rotate-45 rounded-full bg-[radial-gradient(68.54%_68.72%_at_55.02%_31.46%,hsla(0,0%,85%,.08)_0,hsla(0,0%,55%,.02)_50%,hsla(0,0%,45%,0)_80%)]" />
-                    <div className="h-[80rem] absolute left-0 top-0 w-56 -rotate-45 rounded-full bg-[radial-gradient(50%_50%_at_50%_50%,hsla(0,0%,85%,.06)_0,hsla(0,0%,45%,.02)_80%,transparent_100%)] [translate:5%_-50%]" />
-                    <div className="h-[80rem] -translate-y-[350px] absolute left-0 top-0 w-56 -rotate-45 bg-[radial-gradient(50%_50%_at_50%_50%,hsla(0,0%,85%,.04)_0,hsla(0,0%,45%,.02)_80%,transparent_100%)]" />
-                </div>
-                <section>
-                    <div className="relative pt-24 md:pt-36">
-                        <AnimatedGroup
-                            variants={{
-                                container: {
-                                    visible: {
-                                        transition: {
-                                            delayChildren: 1,
-                                        },
-                                    },
-                                },
-                                item: {
-                                    hidden: {
-                                        opacity: 0,
-                                        y: 20,
-                                    },
-                                    visible: {
-                                        opacity: 1,
-                                        y: 0,
-                                        transition: {
-                                            type: 'spring' as const,
-                                            bounce: 0.3,
-                                            duration: 2,
-                                        },
-                                    },
-                                },
-                            }}
-                            className="absolute inset-0 -z-20">
-                            <img
-                                src="https://images.unsplash.com/photo-1518709268805-4e9042af2176?q=80&w=2725&auto=format&fit=crop&ixlib=rb-4.0.3"
-                                alt="coding background"
-                                className="absolute inset-x-0 top-56 -z-20 hidden lg:top-32 dark:block object-cover w-full h-full opacity-20"
-                                width="3276"
-                                height="4095"
-                            />
-                        </AnimatedGroup>
-                        <div aria-hidden className="absolute inset-0 -z-10 size-full [background:radial-gradient(125%_125%_at_50%_100%,transparent_0%,var(--background)_75%)]" />
-                        <div className="mx-auto max-w-7xl px-6">
+            <main className="overflow-hidden relative z-10">
+
+                <section className="min-h-screen">
+                    <div className="relative pt-24 md:pt-36 min-h-screen">
+
+
+
+
+                        <div className="mx-auto max-w-7xl px-6 relative z-20">
                             <div className="text-center sm:mx-auto lg:mr-auto lg:mt-0">
                                 <AnimatedGroup variants={transitionVariants}>
                                     <Link
                                         href="/sign-up"
-                                        className="hover:bg-background dark:hover:border-t-border bg-muted group mx-auto flex w-fit items-center gap-4 rounded-full border p-1 pl-4 shadow-md shadow-black/5 transition-all duration-300 dark:border-t-white/5 dark:shadow-zinc-950">
-                                        <span className="text-foreground text-sm">Introducing Autonomous AI Development</span>
-                                        <span className="dark:border-background block h-4 w-0.5 border-l bg-white dark:bg-zinc-700"></span>
+                                        className="hover:bg-white/10 bg-white/5 group mx-auto flex w-fit items-center gap-4 rounded-full border border-white/20 p-1 pl-4 shadow-md shadow-black/20 transition-all duration-300 backdrop-blur-sm">
+                                        <span className="text-white text-sm">Introducing Autonomous AI Development</span>
+                                        <span className="block h-4 w-0.5 border-l border-white/30 bg-white/30"></span>
 
-                                        <div className="bg-background group-hover:bg-muted size-6 overflow-hidden rounded-full duration-500">
+                                        <div className="bg-white/10 group-hover:bg-white/20 size-6 overflow-hidden rounded-full duration-500">
                                             <div className="flex w-12 -translate-x-1/2 duration-500 ease-in-out group-hover:translate-x-0">
                                                 <span className="flex size-6">
                                                     <ArrowRight className="m-auto size-3" />
@@ -94,13 +57,13 @@ export function HeroSection() {
                                             </div>
                                         </div>
                                     </Link>
-                        
+
                                     <h1
-                                        className="mt-8 max-w-4xl mx-auto text-balance text-6xl md:text-7xl lg:mt-16 xl:text-[5.25rem] font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                                        className="mt-8 max-w-4xl mx-auto text-balance text-6xl md:text-7xl lg:mt-16 xl:text-[5.25rem] font-bold text-white">
                                         The last AI assistant you'll ever need for coding
                                     </h1>
                                     <p
-                                        className="mx-auto mt-8 max-w-2xl text-balance text-lg text-gray-600 dark:text-gray-300">
+                                        className="mx-auto mt-8 max-w-2xl text-balance text-lg text-white/90">
                                         An open-source, end-to-end AI coding assistant built to empower developers with full control, unmatched flexibility, and an autonomous development pipeline.
                                     </p>
                                 </AnimatedGroup>
@@ -135,7 +98,7 @@ export function HeroSection() {
                                         asChild
                                         size="lg"
                                         variant="ghost"
-                                        className="h-10.5 rounded-xl px-5">
+                                        className="h-10.5 rounded-xl px-5 text-white hover:bg-white/10 border border-white/20">
                                         <Link href="https://github.com/your-org/async-coder">
                                             <span className="text-nowrap">View on GitHub</span>
                                         </Link>
@@ -271,7 +234,7 @@ const HeroHeader = () => {
                                     <li key={index}>
                                         <Link
                                             href={item.href}
-                                            className="text-muted-foreground hover:text-accent-foreground block duration-150">
+                                            className="text-white/80 hover:text-white block duration-150">
                                             <span>{item.name}</span>
                                         </Link>
                                     </li>
@@ -334,7 +297,7 @@ const Logo = ({ className }: { className?: string }) => {
             <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">AC</span>
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="text-xl font-bold text-white">
                 Async Coder
             </span>
         </div>

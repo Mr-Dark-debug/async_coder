@@ -1,0 +1,24 @@
+{
+  "name": "Async Coder",
+  "version": "0.1.0",
+  "description": "Open-source, end-to-end AI coding assistant with autonomous development pipeline",
+  "type": "nextjs",
+  "framework": "React 19 + Next.js 15",
+  "language": "TypeScript",
+  "styling": "Tailwind CSS 4",
+  "authentication": "Clerk",
+  "theme": "next-themes",
+  "animations": "Framer Motion",
+  "icons": "Lucide React + Radix UI",
+  "deployment": {
+    "platform": "Vercel",
+    "domain": "asynccoder.dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/async-coder"
+  },
+  "license": "Apache 2.0",
+  "status": "Development",
+  "phase": "Landing Page Complete - Core Features In Progress"
+}

@@ -19,7 +19,7 @@ export const useWindowSize = () => {
     };
 
     window.addEventListener('resize', handleResize);
-    
+
     // Call handler right away so state gets updated with initial window size
     handleResize();
 
@@ -32,14 +32,25 @@ export const useWindowSize = () => {
 
 export const Component = () => {
   const { width, height } = useWindowSize();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient || !width || !height) {
+    return (
+      <div className={cn("absolute inset-0 w-full h-full bg-gradient-to-br from-blue-500/20 to-purple-500/20 animate-pulse")} />
+    );
+  }
 
   return (
-    <div className={cn("flex flex-col items-center")}>
-      <UnicornScene 
-        production={true} 
-        projectId="cbmTT38A0CcuYxeiyj5H" 
-        width={width} 
-        height={height} 
+    <div className={cn("absolute inset-0 w-full h-full blur-sm")}>
+      <UnicornScene
+        production={true}
+        projectId="cbmTT38A0CcuYxeiyj5H"
+        width={width}
+        height={height}
       />
     </div>
   );
