@@ -1,4 +1,4 @@
-# Async Coder  
+# Async Coder
 **_The last AI assistant you'll ever need for coding._**
 
 Async Coder is an **open-source, end-to-end AI coding assistant** built to empower developers with full control, unmatched flexibility, and an **autonomous development pipeline**. Think of it as your **developer co-pilot on steroids** — capable of debugging, writing, refactoring, documenting, testing, creating PRs, and even reviewing pull requests, all while learning from every mistake and continuously improving.
@@ -106,7 +106,8 @@ git clone https://github.com/your-org/async-coder.git
 cd async-coder
 
 # Install dependencies
-pip install -r requirements.txt
+npm install -g pnpm
+pnpm install
 ```
 
 ### **2. Configure AI Backends**
