@@ -23,7 +23,7 @@ export default function Home() {
       </div>
       
       {/* Remaining content sections */}
-      <div className="relative z-10 bg-background/80 backdrop-blur-sm">
+      <div className="relative z-10">
         <Features />
         <AIBackends />
         <QuickStart />
