@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { SignOutButton, useUser } from "@clerk/nextjs";
+import { VercelV0Chat } from "@/components/ui/v0-ai-chat";
 
 export function SidebarDemo() {
   const { user } = useUser();
@@ -145,90 +146,13 @@ export const LogoIcon = () => {
   );
 };
 
-// Dashboard component with AI coding assistant themed content
+// AI Chat Dashboard component
 const Dashboard = () => {
   return (
     <div className="flex flex-1">
       <div className="p-2 md:p-10 rounded-tl-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 flex flex-col gap-2 flex-1 w-full h-full">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-neutral-800 dark:text-neutral-200">
-            Welcome to Async Coder Dashboard
-          </h1>
-          <p className="text-neutral-600 dark:text-neutral-400 mt-2">
-            Your AI-powered coding assistant is ready to help you build amazing software.
-          </p>
-        </div>
-        
-        <div className="flex gap-2 mb-4">
-          {[
-            { title: "Active Projects", value: "3", color: "bg-blue-100 dark:bg-blue-900" },
-            { title: "Code Reviews", value: "12", color: "bg-green-100 dark:bg-green-900" },
-            { title: "AI Suggestions", value: "47", color: "bg-purple-100 dark:bg-purple-900" },
-            { title: "Lines Generated", value: "2.1K", color: "bg-orange-100 dark:bg-orange-900" }
-          ].map((stat, i) => (
-            <div
-              key={"stat-" + i}
-              className={cn(
-                "h-20 w-full rounded-lg flex flex-col justify-center items-center p-4",
-                stat.color
-              )}
-            >
-              <div className="text-lg font-bold text-neutral-800 dark:text-neutral-200">
-                {stat.value}
-              </div>
-              <div className="text-sm text-neutral-600 dark:text-neutral-400 text-center">
-                {stat.title}
-              </div>
-            </div>
-          ))}
-        </div>
-        
-        <div className="flex gap-2 flex-1">
-          <div className="h-full w-2/3 rounded-lg bg-gray-100 dark:bg-neutral-800 p-6 flex flex-col">
-            <h3 className="text-lg font-semibold text-neutral-800 dark:text-neutral-200 mb-4">
-              Recent Activity
-            </h3>
-            <div className="space-y-3 flex-1">
-              {[
-                "Generated authentication middleware for Next.js project",
-                "Reviewed pull request for API optimization",
-                "Created unit tests for user service module",
-                "Refactored database connection logic"
-              ].map((activity, i) => (
-                <div
-                  key={"activity-" + i}
-                  className="p-3 bg-white dark:bg-neutral-700 rounded border border-neutral-200 dark:border-neutral-600"
-                >
-                  <p className="text-sm text-neutral-700 dark:text-neutral-300">
-                    {activity}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-          
-          <div className="h-full w-1/3 rounded-lg bg-gray-100 dark:bg-neutral-800 p-6 flex flex-col">
-            <h3 className="text-lg font-semibold text-neutral-800 dark:text-neutral-200 mb-4">
-              Quick Actions
-            </h3>
-            <div className="space-y-3">
-              {[
-                "Start New Project",
-                "Review Code",
-                "Generate Tests",
-                "Ask AI Assistant"
-              ].map((action, i) => (
-                <button
-                  key={"action-" + i}
-                  className="w-full p-3 bg-white dark:bg-neutral-700 rounded border border-neutral-200 dark:border-neutral-600 hover:bg-neutral-50 dark:hover:bg-neutral-600 transition-colors text-left"
-                >
-                  <span className="text-sm text-neutral-700 dark:text-neutral-300">
-                    {action}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
+        <div className="flex flex-1 items-center justify-center">
+          <VercelV0Chat />
         </div>
       </div>
     </div>
