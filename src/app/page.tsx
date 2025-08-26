@@ -4,7 +4,7 @@ import { HeroSection } from "@/components/ui/hero-section-1";
 import Features from "@/components/Features";
 import AIBackends from "@/components/AIBackends";
 import QuickStart from "@/components/QuickStart";
-import Roadmap from "@/components/Roadmap";
+import EnhancedRoadmap from "@/components/EnhancedRoadmap";
 import Footer from "@/components/Footer";
 
 import { Component as RaycastBackground } from "@/components/ui/raycast-animated-background";
@@ -27,7 +27,7 @@ export default function Home() {
         <Features />
         <AIBackends />
         <QuickStart />
-        <Roadmap />
+        <EnhancedRoadmap />
         <Footer />
       </div>
     </div>
