@@ -1,6 +1,5 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import Link from 'next/link'
 import { Linkedin, Twitter, Github } from 'lucide-react';
 
@@ -34,7 +33,7 @@ export const Component = () => {
               </span>
             </Link>
             <p className='text-gray-600 dark:text-gray-300 font-medium text-base w-full md:w-4/5'>
-              The last AI assistant you'll ever need for coding. Open-source, autonomous development with full control.
+              The last AI assistant you&apos;ll ever need for coding. Open-source, autonomous development with full control.
             </p>
           </div>
 

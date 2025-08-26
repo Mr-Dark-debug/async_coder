@@ -22,7 +22,7 @@ export default function Hero() {
               AI assistant
             </span>
             <br />
-            you'll ever need for coding.
+            you&apos;ll ever need for coding.
           </h2>
 
           {/* Description */}

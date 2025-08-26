@@ -93,7 +93,7 @@ export default function Roadmap() {
             Development Roadmap
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-8">
-            Our vision for the future of AI-powered development. Track our progress and see what's coming next.
+            Our vision for the future of AI-powered development. Track our progress and see what&apos;s coming next.
           </p>
           <div className="inline-flex items-center space-x-2 bg-white dark:bg-gray-800 px-4 py-2 rounded-full border border-gray-200 dark:border-gray-700">
             <span className="text-gray-600 dark:text-gray-300 text-sm font-medium">

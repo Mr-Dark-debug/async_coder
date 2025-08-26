@@ -31,6 +31,11 @@ export const metadata: Metadata = {
   authors: [{ name: "Async Coder Team" }],
   creator: "Async Coder",
   publisher: "Async Coder",
+  icons: {
+    icon: '/logo.png',
+    shortcut: '/logo.png',
+    apple: '/logo.png',
+  },
   openGraph: {
     title: "Async Coder - The last AI assistant you'll ever need for coding",
     description: "Open-source, end-to-end AI coding assistant with autonomous development pipeline",

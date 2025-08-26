@@ -20,12 +20,10 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { SignOutButton, useUser } from "@clerk/nextjs";
 import { VercelV0Chat } from "@/components/ui/v0-ai-chat";
 import sidebarData from "@/json/sidebar-data.json";
 
-export function SidebarDemo() {
-  const { user } = useUser();
+export function SidebarDemo({ children }: { children?: React.ReactNode }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isRecentTasksOpen, setIsRecentTasksOpen] = useState(true);
   const [isCodebasesOpen, setIsCodebasesOpen] = useState(true);
@@ -219,7 +217,7 @@ export function SidebarDemo() {
           </div>
         </SidebarBody>
       </Sidebar>
-      <Dashboard />
+      <Dashboard>{children}</Dashboard>
     </div>
   );
 }
@@ -266,12 +264,12 @@ export const LogoIcon = () => {
 };
 
 // AI Chat Dashboard component
-const Dashboard = () => {
+const Dashboard = ({ children }: { children?: React.ReactNode }) => {
   return (
     <div className="flex flex-1">
       <div className="p-2 md:p-10 rounded-tl-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 flex flex-col gap-2 flex-1 w-full h-full">
         <div className="flex flex-1 items-center justify-center">
-          <VercelV0Chat />
+          {children || <VercelV0Chat />}
         </div>
       </div>
     </div>
