@@ -22,6 +22,9 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { VercelV0Chat } from "@/components/ui/v0-ai-chat";
 import sidebarData from "@/json/sidebar-data.json";
+import { SignedIn, UserButton } from "@clerk/nextjs";
+import { AIVoiceInput } from "@/components/ui/ai-voice-input";
+import { Mic } from "lucide-react";
 
 export function SidebarDemo({ children }: { children?: React.ReactNode }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -54,16 +57,27 @@ export function SidebarDemo({ children }: { children?: React.ReactNode }) {
             
             {/* Search Bar */}
             <div className="mt-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-500 h-4 w-4" />
-                <input
-                  type="text"
-                  placeholder="Search for repo or tasks"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-neutral-200 text-sm placeholder-neutral-500 focus:outline-none focus:border-neutral-600"
-                />
-              </div>
+              {open ? (
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-500 h-4 w-4" />
+                  <input
+                    type="text"
+                    placeholder="Search for repo or tasks"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-neutral-200 text-sm placeholder-neutral-500 focus:outline-none focus:border-neutral-600"
+                  />
+                </div>
+              ) : (
+                <button
+                  className="mx-auto flex h-8 w-8 items-center justify-center rounded-md bg-neutral-800 border border-neutral-700 text-neutral-300 hover:text-white"
+                  title="Search"
+                  aria-label="Open search"
+                  onClick={() => setOpen(true)}
+                >
+                  <Search className="h-4 w-4" />
+                </button>
+              )}
             </div>
 
             {/* Main Navigation - Only Dashboard */}
@@ -81,90 +95,124 @@ export function SidebarDemo({ children }: { children?: React.ReactNode }) {
 
             {/* Recent Tasks Section */}
             <div className="mt-6">
-              <button
-                onClick={() => setIsRecentTasksOpen(!isRecentTasksOpen)}
-                className="flex items-center justify-between w-full text-left text-neutral-400 hover:text-neutral-200 transition-colors"
-              >
-                <span className="text-sm font-medium">Recent tasks</span>
-                {isRecentTasksOpen ? (
-                  <ChevronDown className="h-4 w-4" />
-                ) : (
-                  <ChevronRight className="h-4 w-4" />
-                )}
-              </button>
-              
-              {isRecentTasksOpen && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="mt-2 space-y-1"
-                >
-                  {filteredRecentTasks.map((task) => (
-                    <div
-                      key={task.id}
-                      className="flex items-center gap-2 p-2 hover:bg-neutral-800 rounded-lg cursor-pointer"
+              {open ? (
+                <>
+                  <button
+                    onClick={() => setIsRecentTasksOpen(!isRecentTasksOpen)}
+                    className="flex items-center justify-between w-full text-left text-neutral-400 hover:text-neutral-200 transition-colors"
+                  >
+                    <span className="text-sm font-medium">Recent tasks</span>
+                    {isRecentTasksOpen ? (
+                      <ChevronDown className="h-4 w-4" />
+                    ) : (
+                      <ChevronRight className="h-4 w-4" />
+                    )}
+                  </button>
+                  {isRecentTasksOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="mt-2 space-y-1"
                     >
-                      <Clock className="h-3 w-3 text-neutral-500 flex-shrink-0" />
-                      <span className="text-xs text-neutral-300 truncate">
-                        {task.title}
-                      </span>
-                    </div>
+                      {filteredRecentTasks.map((task) => (
+                        <div
+                          key={task.id}
+                          className="flex items-center gap-2 p-2 hover:bg-neutral-800 rounded-lg cursor-pointer"
+                          title={task.title}
+                        >
+                          <Clock className="h-3 w-3 text-neutral-500 flex-shrink-0" />
+                          <span className="text-xs text-neutral-300 truncate">
+                            {task.title}
+                          </span>
+                        </div>
+                      ))}
+                    </motion.div>
+                  )}
+                </>
+              ) : (
+                <div className="flex flex-col items-center gap-2" aria-label="Recent tasks">
+                  {filteredRecentTasks.slice(0, 4).map((task) => (
+                    <button
+                      key={task.id}
+                      className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-neutral-800 text-neutral-400 hover:text-neutral-200"
+                      title={task.title}
+                      aria-label={task.title}
+                    >
+                      <Clock className="h-4 w-4" />
+                    </button>
                   ))}
-                </motion.div>
+                </div>
               )}
             </div>
 
             {/* Codebases Section */}
             <div className="mt-6">
-              <button
-                onClick={() => setIsCodebasesOpen(!isCodebasesOpen)}
-                className="flex items-center justify-between w-full text-left text-neutral-400 hover:text-neutral-200 transition-colors"
-              >
-                <span className="text-sm font-medium">Codebases</span>
-                {isCodebasesOpen ? (
-                  <ChevronDown className="h-4 w-4" />
-                ) : (
-                  <ChevronRight className="h-4 w-4" />
-                )}
-              </button>
-              
-              {isCodebasesOpen && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="mt-2 space-y-1"
-                >
-                  {filteredCodebases.map((codebase) => (
-                    <div
-                      key={codebase.id}
-                      className="flex items-center gap-2 p-2 hover:bg-neutral-800 rounded-lg cursor-pointer group"
+              {open ? (
+                <>
+                  <button
+                    onClick={() => setIsCodebasesOpen(!isCodebasesOpen)}
+                    className="flex items-center justify-between w-full text-left text-neutral-400 hover:text-neutral-200 transition-colors"
+                  >
+                    <span className="text-sm font-medium">Codebases</span>
+                    {isCodebasesOpen ? (
+                      <ChevronDown className="h-4 w-4" />
+                    ) : (
+                      <ChevronRight className="h-4 w-4" />
+                    )}
+                  </button>
+                  {isCodebasesOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="mt-2 space-y-1"
                     >
-                      <Github className="h-4 w-4 text-neutral-500 flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-neutral-300 truncate">
-                            {codebase.fullName}
-                          </span>
-                          {codebase.isPrivate && (
-                            <Lock className="h-3 w-3 text-neutral-500" />
-                          )}
-                          {!codebase.isPrivate && (
-                            <Globe className="h-3 w-3 text-neutral-500" />
+                      {filteredCodebases.map((codebase) => (
+                        <div
+                          key={codebase.id}
+                          className="flex items-center gap-2 p-2 hover:bg-neutral-800 rounded-lg cursor-pointer group"
+                          title={codebase.fullName}
+                        >
+                          <Github className="h-4 w-4 text-neutral-500 flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-neutral-300 truncate">
+                                {codebase.fullName}
+                              </span>
+                              {codebase.isPrivate && (
+                                <Lock className="h-3 w-3 text-neutral-500" />
+                              )}
+                              {!codebase.isPrivate && (
+                                <Globe className="h-3 w-3 text-neutral-500" />
+                              )}
+                            </div>
+                          </div>
+                          {codebase.hasNotifications && (
+                            <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0">
+                              {codebase.notificationCount && (
+                                <span className="sr-only">{codebase.notificationCount}</span>
+                              )}
+                            </div>
                           )}
                         </div>
-                      </div>
-                      {codebase.hasNotifications && (
-                        <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0">
-                          {codebase.notificationCount && (
-                            <span className="sr-only">{codebase.notificationCount}</span>
-                          )}
-                        </div>
-                      )}
-                    </div>
+                      ))}
+                    </motion.div>
+                  )}
+                </>
+              ) : (
+                <div className="flex flex-col items-center gap-2" aria-label="Codebases">
+                  {filteredCodebases.slice(0, 4).map((codebase) => (
+                    <button
+                      key={codebase.id}
+                      className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-neutral-800 text-neutral-400 hover:text-neutral-200"
+                      title={codebase.fullName}
+                      aria-label={codebase.fullName}
+                    >
+                      <Github className="h-4 w-4" />
+                    </button>
                   ))}
-                </motion.div>
+                </div>
               )}
             </div>
           </div>
@@ -185,35 +233,48 @@ export function SidebarDemo({ children }: { children?: React.ReactNode }) {
             </div>
 
             {/* Daily Task Limit */}
-            <div className="mb-4 px-2">
-              <div className="text-xs text-neutral-400 mb-1">
-                Daily task limit ({sidebarData.dailyTaskLimit.current}/{sidebarData.dailyTaskLimit.maximum})
+            {open ? (
+              <div className="mb-4 px-2">
+                <div className="text-xs text-neutral-400 mb-1">
+                  Daily task limit ({sidebarData.dailyTaskLimit.current}/{sidebarData.dailyTaskLimit.maximum})
+                </div>
+                <div className="w-full bg-neutral-700 rounded-full h-1">
+                  <div 
+                    className="bg-blue-500 h-1 rounded-full transition-all"
+                    style={{ 
+                      width: `${(sidebarData.dailyTaskLimit.current / sidebarData.dailyTaskLimit.maximum) * 100}%` 
+                    }}
+                  ></div>
+                </div>
               </div>
-              <div className="w-full bg-neutral-700 rounded-full h-1">
-                <div 
-                  className="bg-blue-500 h-1 rounded-full transition-all"
-                  style={{ 
-                    width: `${(sidebarData.dailyTaskLimit.current / sidebarData.dailyTaskLimit.maximum) * 100}%` 
-                  }}
-                ></div>
+            ) : (
+              <div className="mb-4 flex flex-col items-center gap-3">
+                <SignedIn>
+                  <UserButton appearance={{ elements: { avatarBox: "w-8 h-8" } }} />
+                </SignedIn>
+                <div className="text-[10px] text-neutral-400">
+                  {sidebarData.dailyTaskLimit.current}/{sidebarData.dailyTaskLimit.maximum}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Footer Links */}
-            <div className="flex items-center justify-center gap-4">
-              {sidebarData.footerLinks.map((link) => (
-                <a
-                  key={link.name}
-                  href={link.url}
-                  className="text-neutral-400 hover:text-neutral-200 transition-colors"
-                  title={link.name}
-                >
-                  {link.icon === 'FileText' && <FileText className="h-4 w-4" />}
-                  {link.icon === 'MessageCircle' && <MessageCircle className="h-4 w-4" />}
-                  {link.icon === 'Twitter' && <Twitter className="h-4 w-4" />}
-                </a>
-              ))}
-            </div>
+            {open && (
+              <div className="flex items-center justify-center gap-4">
+                {sidebarData.footerLinks.map((link) => (
+                  <a
+                    key={link.name}
+                    href={link.url}
+                    className="text-neutral-400 hover:text-neutral-200 transition-colors"
+                    title={link.name}
+                  >
+                    {link.icon === 'FileText' && <FileText className="h-4 w-4" />}
+                    {link.icon === 'MessageCircle' && <MessageCircle className="h-4 w-4" />}
+                    {link.icon === 'Twitter' && <Twitter className="h-4 w-4" />}
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
         </SidebarBody>
       </Sidebar>
@@ -265,13 +326,18 @@ export const LogoIcon = () => {
 
 // AI Chat Dashboard component
 const Dashboard = ({ children }: { children?: React.ReactNode }) => {
+
   return (
-    <div className="flex flex-1">
+    <div className="flex flex-1 relative">
       <div className="p-2 md:p-10 rounded-tl-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 flex flex-col gap-2 flex-1 w-full h-full">
         <div className="flex flex-1 items-center justify-center">
           {children || <VercelV0Chat />}
         </div>
       </div>
+
+
+
+
     </div>
   );
 };

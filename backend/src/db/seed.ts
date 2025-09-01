@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { db } from '@/config/database';
 import { 
   aiModels, 
@@ -120,7 +121,7 @@ async function seedAIModels() {
 
   for (const model of models) {
     try {
-      await db.insert(aiModels).values(model).onConflictDoNothing();
+      await db.insert(aiModels).values(model as any).onConflictDoNothing();
       logger.info(`Seeded AI model: ${model.name}`);
     } catch (error) {
       logger.error(`Failed to seed AI model ${model.name}:`, error);
@@ -267,24 +268,35 @@ async function seedCreditPackages() {
 async function seedAIProviderConfigs() {
   logger.info('Seeding AI provider configurations...');
 
+  // Helper function to check if API key is a placeholder
+  const isPlaceholder = (key: string) => {
+    return !key || 
+           key.includes('your-') || 
+           key.includes('sk-your') || 
+           key.includes('sk-ant-your') ||
+           key === 'your-openai-api-key' ||
+           key === 'your-anthropic-api-key' ||
+           key === 'your-google-ai-api-key';
+  };
+
   const configs = [
     {
       provider: 'openai',
-      apiKey: process.env.OPENAI_API_KEY ? 
-        EncryptionService.encryptApiKey(process.env.OPENAI_API_KEY) : null,
+      apiKey: (process.env['OPENAI_API_KEY'] && !isPlaceholder(process.env['OPENAI_API_KEY'])) ? 
+        EncryptionService.encryptApiKey(process.env['OPENAI_API_KEY']) : null,
       baseUrl: 'https://api.openai.com/v1',
       configuration: {
-        organization: process.env.OPENAI_ORG_ID,
+        organization: process.env['OPENAI_ORG_ID'],
         defaultModel: 'gpt-4',
         maxRetries: 3,
         timeout: 60000,
       },
-      isActive: !!process.env.OPENAI_API_KEY,
+      isActive: !!(process.env['OPENAI_API_KEY'] && !isPlaceholder(process.env['OPENAI_API_KEY'])),
     },
     {
       provider: 'anthropic',
-      apiKey: process.env.ANTHROPIC_API_KEY ? 
-        EncryptionService.encryptApiKey(process.env.ANTHROPIC_API_KEY) : null,
+      apiKey: (process.env['ANTHROPIC_API_KEY'] && !isPlaceholder(process.env['ANTHROPIC_API_KEY'])) ? 
+        EncryptionService.encryptApiKey(process.env['ANTHROPIC_API_KEY']) : null,
       baseUrl: 'https://api.anthropic.com',
       configuration: {
         version: '2023-06-01',
@@ -292,12 +304,12 @@ async function seedAIProviderConfigs() {
         maxRetries: 3,
         timeout: 60000,
       },
-      isActive: !!process.env.ANTHROPIC_API_KEY,
+      isActive: !!(process.env['ANTHROPIC_API_KEY'] && !isPlaceholder(process.env['ANTHROPIC_API_KEY'])),
     },
     {
       provider: 'google',
-      apiKey: process.env.GOOGLE_AI_API_KEY ? 
-        EncryptionService.encryptApiKey(process.env.GOOGLE_AI_API_KEY) : null,
+      apiKey: (process.env['GOOGLE_AI_API_KEY'] && !isPlaceholder(process.env['GOOGLE_AI_API_KEY'])) ? 
+        EncryptionService.encryptApiKey(process.env['GOOGLE_AI_API_KEY']) : null,
       baseUrl: 'https://generativelanguage.googleapis.com',
       configuration: {
         version: 'v1beta',
@@ -305,17 +317,18 @@ async function seedAIProviderConfigs() {
         maxRetries: 3,
         timeout: 60000,
       },
-      isActive: !!process.env.GOOGLE_AI_API_KEY,
+      isActive: !!(process.env['GOOGLE_AI_API_KEY'] && !isPlaceholder(process.env['GOOGLE_AI_API_KEY'])),
     },
   ];
 
   for (const config of configs) {
     try {
+      // Insert the config regardless of API key status for structure
+      await db.insert(aiProviderConfigs).values(config as any).onConflictDoNothing();
       if (config.apiKey) {
-        await db.insert(aiProviderConfigs).values(config as any).onConflictDoNothing();
-        logger.info(`Seeded AI provider config: ${config.provider}`);
+        logger.info(`Seeded AI provider config: ${config.provider} (with encrypted API key)`);
       } else {
-        logger.warn(`Skipping ${config.provider} config - no API key provided`);
+        logger.info(`Seeded AI provider config: ${config.provider} (placeholder - no API key)`);
       }
     } catch (error) {
       logger.error(`Failed to seed AI provider config ${config.provider}:`, error);

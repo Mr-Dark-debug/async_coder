@@ -18,9 +18,9 @@ import webhookRoutes from '@/routes/webhooks';
 import adminRoutes from '@/routes/admin';
 
 // Server configuration
-const PORT = parseInt(process.env.PORT || '3001');
-const HOST = process.env.HOST || 'localhost';
-const NODE_ENV = process.env.NODE_ENV || 'development';
+const PORT = parseInt(process.env['PORT'] || '3001');
+const HOST = process.env['HOST'] || 'localhost';
+const NODE_ENV = process.env['NODE_ENV'] || 'development';
 
 // Create Fastify instance
 const fastify = Fastify({
@@ -79,7 +79,7 @@ async function registerPlugins() {
 
   // CORS
   await fastify.register(cors, {
-    origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3000'],
+    origin: process.env['CORS_ORIGIN']?.split(',') || ['http://localhost:3000'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key'],
@@ -87,12 +87,12 @@ async function registerPlugins() {
 
   // Rate limiting
   await fastify.register(rateLimit, {
-    max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100'),
-    timeWindow: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'), // 15 minutes
+    max: parseInt(process.env['RATE_LIMIT_MAX_REQUESTS'] || '100'),
+    timeWindow: parseInt(process.env['RATE_LIMIT_WINDOW_MS'] || '900000'), // 15 minutes
     redis: {
-      host: process.env.REDIS_HOST || 'localhost',
-      port: parseInt(process.env.REDIS_PORT || '6379'),
-      password: process.env.REDIS_PASSWORD,
+      host: process.env['REDIS_HOST'] || 'localhost',
+      port: parseInt(process.env['REDIS_PORT'] || '6379'),
+      password: process.env['REDIS_PASSWORD'],
     },
   });
 
@@ -110,7 +110,7 @@ async function registerPlugins() {
 // Register routes
 async function registerRoutes() {
   // Health check
-  fastify.get('/health', async (request, reply) => {
+  fastify.get('/health', async (_request, reply) => {
     const dbHealthy = await checkDatabaseConnection();
     const redisHealthy = await checkRedisConnection();
 
@@ -122,7 +122,7 @@ async function registerRoutes() {
         redis: redisHealthy ? 'healthy' : 'unhealthy',
         queue: 'healthy', // Simplified check
       },
-      version: process.env.npm_package_version || '1.0.0',
+      version: process.env['npm_package_version'] || '1.0.0',
       environment: NODE_ENV,
     };
 

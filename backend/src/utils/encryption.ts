@@ -2,13 +2,12 @@ import crypto from 'crypto';
 import { logger } from './logger';
 
 // Encryption configuration
-const ALGORITHM = 'aes-256-gcm';
+const ALGORITHM = 'aes-256-cbc';
 const KEY_LENGTH = 32; // 256 bits
 const IV_LENGTH = 16; // 128 bits
-const TAG_LENGTH = 16; // 128 bits
 
 // Get encryption key from environment
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
+const ENCRYPTION_KEY = process.env['ENCRYPTION_KEY'];
 
 if (!ENCRYPTION_KEY) {
   throw new Error('ENCRYPTION_KEY environment variable is required');
@@ -23,17 +22,18 @@ export class EncryptionService {
    */
   static encrypt(text: string): string {
     try {
+      if (!ENCRYPTION_KEY) {
+        throw new Error('ENCRYPTION_KEY environment variable is required');
+      }
+
       const iv = crypto.randomBytes(IV_LENGTH);
-      const cipher = crypto.createCipher(ALGORITHM, derivedKey);
-      cipher.setAAD(Buffer.from('async-coder', 'utf8'));
+      const cipher = crypto.createCipheriv(ALGORITHM, derivedKey, iv);
       
       let encrypted = cipher.update(text, 'utf8', 'hex');
       encrypted += cipher.final('hex');
       
-      const tag = cipher.getAuthTag();
-      
-      // Combine iv, tag, and encrypted data
-      const result = iv.toString('hex') + ':' + tag.toString('hex') + ':' + encrypted;
+      // Combine iv and encrypted data
+      const result = iv.toString('hex') + ':' + encrypted;
       
       return result;
     } catch (error) {
@@ -48,17 +48,19 @@ export class EncryptionService {
   static decrypt(encryptedData: string): string {
     try {
       const parts = encryptedData.split(':');
-      if (parts.length !== 3) {
+      if (parts.length !== 2 || !parts[0] || !parts[1]) {
         throw new Error('Invalid encrypted data format');
       }
 
-      const iv = Buffer.from(parts[0], 'hex');
-      const tag = Buffer.from(parts[1], 'hex');
-      const encrypted = parts[2];
+      const ivHex = parts[0];
+      const encrypted = parts[1];
+      const iv = Buffer.from(ivHex, 'hex');
 
-      const decipher = crypto.createDecipher(ALGORITHM, derivedKey);
-      decipher.setAAD(Buffer.from('async-coder', 'utf8'));
-      decipher.setAuthTag(tag);
+      if (!ENCRYPTION_KEY) {
+        throw new Error('ENCRYPTION_KEY environment variable is required');
+      }
+
+      const decipher = crypto.createDecipheriv(ALGORITHM, derivedKey, iv);
 
       let decrypted = decipher.update(encrypted, 'hex', 'utf8');
       decrypted += decipher.final('utf8');

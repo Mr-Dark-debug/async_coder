@@ -88,11 +88,14 @@ export const DesktopSidebar = ({
   return (
     <motion.div
       className={cn(
-        "h-full px-4 py-4 hidden md:flex md:flex-col bg-neutral-100 dark:bg-neutral-800 w-[300px] flex-shrink-0",
+        // Reduce horizontal padding when collapsed to avoid clipping
+        "h-full py-4 hidden md:flex md:flex-col bg-neutral-100 dark:bg-neutral-800 w-[300px] flex-shrink-0",
+        open ? "px-4" : "px-2",
         className
       )}
       animate={{
-        width: animate ? (open ? "300px" : "60px") : "300px",
+        // Give collapsed state a bit more width for icons
+        width: animate ? (open ? "300px" : "72px") : "300px",
       }}
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
@@ -167,7 +170,9 @@ export const SidebarLink = ({
     <Link
       href={link.href}
       className={cn(
-        "flex items-center justify-start gap-2 group/sidebar py-2",
+        // Center icons when collapsed; left-align with label when open
+        "flex items-center group/sidebar py-2",
+        open ? "justify-start gap-2" : "justify-center gap-0",
         className
       )}
       {...props}
