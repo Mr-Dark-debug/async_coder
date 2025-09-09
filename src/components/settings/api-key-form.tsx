@@ -4,12 +4,12 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Eye, EyeOff, ExternalLink, CheckCircle, XCircle, TestTube } from 'lucide-react';
 import { useAPIKeys, type APIKeyProvider } from '@/hooks/use-api-keys';
 import { toast } from 'sonner';
+import Image from 'next/image';
 
 interface APIKeyFormProps {
   provider: APIKeyProvider;
@@ -22,7 +22,7 @@ export function APIKeyForm({ provider, onSuccess, onCancel }: APIKeyFormProps) {
   const [formData, setFormData] = useState({
     name: '',
     keyValue: '',
-    metadata: {} as Record<string, any>,
+    metadata: {} as Record<string, string | number | boolean>,
   });
   const [showKey, setShowKey] = useState(false);
   const [testResult, setTestResult] = useState<{ valid: boolean; error?: string } | null>(null);
@@ -103,10 +103,12 @@ export function APIKeyForm({ provider, onSuccess, onCancel }: APIKeyFormProps) {
       <CardHeader>
         <div className="flex items-center gap-3">
           {provider.logoUrl && (
-            <img
+            <Image
               src={provider.logoUrl}
               alt={provider.displayName}
-              className="w-8 h-8 rounded"
+              width={32}
+              height={32}
+              className="rounded"
             />
           )}
           <div>
@@ -194,7 +196,7 @@ export function APIKeyForm({ provider, onSuccess, onCancel }: APIKeyFormProps) {
               <Input
                 id={field}
                 placeholder={`Enter ${field}`}
-                value={formData.metadata[field] || ''}
+                value={String(formData.metadata[field] || '')}
                 onChange={(e) => handleInputChange(field, e.target.value)}
                 required
               />
@@ -208,7 +210,7 @@ export function APIKeyForm({ provider, onSuccess, onCancel }: APIKeyFormProps) {
               <Input
                 id={field}
                 placeholder={`Enter ${field} (optional)`}
-                value={formData.metadata[field] || ''}
+                value={String(formData.metadata[field] || '')}
                 onChange={(e) => handleInputChange(field, e.target.value)}
               />
             </div>

@@ -23,8 +23,6 @@ import { cn } from "@/lib/utils";
 import { VercelV0Chat } from "@/components/ui/v0-ai-chat";
 import sidebarData from "@/json/sidebar-data.json";
 import { SignedIn, UserButton } from "@clerk/nextjs";
-import { AIVoiceInput } from "@/components/ui/ai-voice-input";
-import { Mic } from "lucide-react";
 
 export function SidebarDemo({ children }: { children?: React.ReactNode }) {
   const [searchQuery, setSearchQuery] = useState("");

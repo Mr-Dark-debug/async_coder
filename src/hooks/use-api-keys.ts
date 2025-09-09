@@ -20,7 +20,7 @@ export interface APIKeyProvider {
     testEndpoint?: string;
     requiredFields?: string[];
     optionalFields?: string[];
-    [key: string]: any;
+    [key: string]: string | number | boolean | string[] | undefined;
   };
 }
 
@@ -32,7 +32,7 @@ export interface APIKey {
   isActive: boolean;
   lastUsed?: string;
   usageCount: number;
-  metadata: Record<string, any>;
+  metadata: Record<string, string | number | boolean>;
   createdAt: string;
   updatedAt: string;
 }
@@ -102,7 +102,7 @@ export function useAPIKeys() {
     provider: string,
     name: string,
     keyValue: string,
-    metadata: Record<string, any> = {}
+    metadata: Record<string, string | number | boolean> = {}
   ): Promise<boolean> => {
     setSaving(true);
     try {
@@ -142,7 +142,7 @@ export function useAPIKeys() {
   const testAPIKey = async (
     provider: string,
     keyValue: string,
-    metadata: Record<string, any> = {}
+    metadata: Record<string, string | number | boolean> = {}
   ): Promise<{ valid: boolean; error?: string }> => {
     setTesting(true);
     try {

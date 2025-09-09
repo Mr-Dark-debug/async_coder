@@ -2,14 +2,15 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Trash2, Eye, Calendar, Activity, TrendingUp, Copy } from 'lucide-react';
-import { useAPIKeys, type APIKey, type APIKeyProvider } from '@/hooks/use-api-keys';
+import { useAPIKeys, type APIKey, type APIKeyProvider, type APIKeyUsageStats } from '@/hooks/use-api-keys';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
+import Image from 'next/image';
 
 interface APIKeyListProps {
   provider: APIKeyProvider;
@@ -19,13 +20,13 @@ interface APIKeyListProps {
 export function APIKeyList({ provider, onAddKey }: APIKeyListProps) {
   const { getAPIKeysByProvider, deleteAPIKey, getUsageStats } = useAPIKeys();
   const [deletingKeyId, setDeletingKeyId] = useState<string | null>(null);
-  const [usageStats, setUsageStats] = useState<Record<string, any>>({});
+  const [usageStats, setUsageStats] = useState<Record<string, APIKeyUsageStats>>({});
 
   const apiKeys = getAPIKeysByProvider(provider.provider);
 
   const handleDelete = async (keyId: string) => {
     setDeletingKeyId(keyId);
-    const success = await deleteAPIKey(keyId);
+    await deleteAPIKey(keyId);
     setDeletingKeyId(null);
   };
 
@@ -50,10 +51,12 @@ export function APIKeyList({ provider, onAddKey }: APIKeyListProps) {
           <div className="text-center space-y-3">
             <div className="w-16 h-16 mx-auto bg-muted rounded-full flex items-center justify-center">
               {provider.logoUrl ? (
-                <img
+                <Image
                   src={provider.logoUrl}
                   alt={provider.displayName}
-                  className="w-8 h-8 rounded"
+                  width={32}
+                  height={32}
+                  className="rounded"
                 />
               ) : (
                 <Activity className="w-8 h-8 text-muted-foreground" />
@@ -97,7 +100,6 @@ export function APIKeyList({ provider, onAddKey }: APIKeyListProps) {
           <APIKeyCard
             key={apiKey.id}
             apiKey={apiKey}
-            provider={provider}
             onDelete={() => handleDelete(apiKey.id)}
             onCopyKey={() => handleCopyKey(apiKey.keyPreview)}
             onLoadStats={() => loadUsageStats(apiKey.id)}
@@ -112,17 +114,15 @@ export function APIKeyList({ provider, onAddKey }: APIKeyListProps) {
 
 interface APIKeyCardProps {
   apiKey: APIKey;
-  provider: APIKeyProvider;
   onDelete: () => void;
   onCopyKey: () => void;
   onLoadStats: () => void;
-  usageStats?: any;
+  usageStats?: APIKeyUsageStats;
   isDeleting: boolean;
 }
 
 function APIKeyCard({ 
   apiKey, 
-  provider, 
   onDelete, 
   onCopyKey, 
   onLoadStats, 
@@ -195,7 +195,7 @@ function APIKeyCard({
                 <AlertDialogHeader>
                   <AlertDialogTitle>Delete API Key</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Are you sure you want to delete "{apiKey.name}"? This action cannot be undone.
+                    Are you sure you want to delete &quot;{apiKey.name}&quot;? This action cannot be undone.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

@@ -69,7 +69,7 @@ export function EnvironmentVariableDialog({
         </DialogHeader>
 
         <div className="space-y-4">
-          {variables.map((variable, index) => (
+          {variables.map((variable) => (
             <div key={variable.id} className="space-y-3">
               <div className="flex items-center gap-3">
                 <div className="flex-1">

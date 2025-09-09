@@ -7,7 +7,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Select } from '@/components/ui/select';
 import { X } from 'lucide-react';
 
 interface PreinstalledPackagesDialogProps {

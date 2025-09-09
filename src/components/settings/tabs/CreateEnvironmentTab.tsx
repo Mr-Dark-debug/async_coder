@@ -4,9 +4,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
 import { ChevronRight, Github, Search, Settings, Info, Plus } from 'lucide-react';
 import { PreinstalledPackagesDialog } from '../dialogs/PreinstalledPackagesDialog';
 import { EnvironmentVariableDialog } from '../dialogs/EnvironmentVariableDialog';
@@ -26,7 +24,6 @@ export function CreateEnvironmentTab({ onBack }: { onBack: () => void }) {
   const [envName, setEnvName] = useState('');
   const [description, setDescription] = useState('');
   const [containerImage, setContainerImage] = useState('universal');
-  const [preinstalledPackages, setPreinstalledPackages] = useState(false);
   const [containerCaching, setContainerCaching] = useState(false);
   const [setupScript, setSetupScript] = useState('Automatic');
   const [agentAccess, setAgentAccess] = useState(false);
@@ -34,8 +31,8 @@ export function CreateEnvironmentTab({ onBack }: { onBack: () => void }) {
   const [showPackagesDialog, setShowPackagesDialog] = useState(false);
   const [showEnvDialog, setShowEnvDialog] = useState(false);
   const [showSecretsDialog, setShowSecretsDialog] = useState(false);
-  const [environmentVariables, setEnvironmentVariables] = useState<Array<{key: string, value: string}>>([]);
-  const [secrets, setSecrets] = useState<Array<{key: string, value: string}>>([]);
+  const [environmentVariables] = useState<Array<{key: string, value: string}>>([]);
+  const [secrets] = useState<Array<{key: string, value: string}>>([]);
 
   // Mock repositories - in real app, fetch from GitHub API
   const repositories: Repository[] = [

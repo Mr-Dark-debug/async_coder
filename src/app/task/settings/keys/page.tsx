@@ -6,13 +6,14 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import { Search, Plus, Key, Zap, Cloud, Code, MessageSquare, BarChart3, Settings } from 'lucide-react';
 import { useAPIKeys, type APIKeyProvider } from '@/hooks/use-api-keys';
 import { APIKeyForm } from '@/components/settings/api-key-form';
 import { APIKeyList } from '@/components/settings/api-key-list';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const categoryIcons = {
   ai_models: Zap,
@@ -221,10 +222,12 @@ function ProvidersGrid({ providers, onAddKey }: ProvidersGridProps) {
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
                   {provider.logoUrl && (
-                    <img
+                    <Image
                       src={provider.logoUrl}
                       alt={provider.displayName}
-                      className="w-8 h-8 rounded"
+                      width={32}
+                      height={32}
+                      className="rounded"
                     />
                   )}
                   <div>
