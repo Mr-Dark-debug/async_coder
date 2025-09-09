@@ -132,12 +132,7 @@ export function CreateEnvironmentTab({ onBack }: { onBack: () => void }) {
               </div>
               
               {/* Repository List */}
-              <div className="bg-neutral-800 border border-neutral-700 rounded-lg max-h-48 overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                <style jsx>{`
-                  div::-webkit-scrollbar {
-                    display: none;
-                  }
-                `}</style>
+              <div className="bg-neutral-800 border border-neutral-700 rounded-lg max-h-48 overflow-y-auto scrollbar-hide">
                 {filteredRepos.map((repo, index) => (
                   <div
                     key={index}
