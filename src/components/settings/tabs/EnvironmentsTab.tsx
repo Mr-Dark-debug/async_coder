@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { LoadingButton } from '@/components/ui/loading-button';
 import { Input } from '@/components/ui/input';
 import { Plus, Search } from 'lucide-react';
 import { CreateEnvironmentTab } from './CreateEnvironmentTab';
@@ -17,6 +18,7 @@ interface Environment {
 export function EnvironmentsTab() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
   
   // Empty array - no dummy data
   const environments: Environment[] = [];
@@ -25,6 +27,17 @@ export function EnvironmentsTab() {
     env.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     env.repo.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleCreateEnvironment = async () => {
+    setIsNavigating(true);
+    try {
+      // Simulate navigation delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setShowCreateForm(true);
+    } finally {
+      setIsNavigating(false);
+    }
+  };
 
   if (showCreateForm) {
     return <CreateEnvironmentTab onBack={() => setShowCreateForm(false)} />;
@@ -44,13 +57,15 @@ export function EnvironmentsTab() {
             className="pl-10 bg-neutral-800 border-neutral-700 text-white placeholder-neutral-400"
           />
         </div>
-        <Button 
-          onClick={() => setShowCreateForm(true)}
+        <LoadingButton 
+          loading={isNavigating}
+          loadingText="Loading..."
+          onClick={handleCreateEnvironment}
           className="bg-white text-black hover:bg-neutral-100 font-medium px-4 py-2 rounded-lg flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
           Create environment
-        </Button>
+        </LoadingButton>
       </div>
 
       {/* Environments table */}
