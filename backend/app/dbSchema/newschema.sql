@@ -439,6 +439,46 @@ CREATE TABLE public.user_preferences (
   CONSTRAINT user_preferences_user_id_fk FOREIGN KEY (user_id) REFERENCES public.users(id)
 );
 
+-- Insert default API key providers
+INSERT INTO public.api_key_providers (provider, display_name, description, category, website_url, docs_url, configuration) VALUES
+('openai', 'OpenAI', 'OpenAI GPT models and APIs', 'ai_models', 'https://openai.com', 'https://platform.openai.com/docs', '{"keyFormat": "sk-[A-Za-z0-9]{48}", "keyPrefix": "sk-", "baseUrl": "https://api.openai.com/v1", "authType": "bearer", "testEndpoint": "/models"}'),
+('claude', 'Anthropic Claude', 'Anthropic Claude AI models', 'ai_models', 'https://anthropic.com', 'https://docs.anthropic.com', '{"keyFormat": "sk-ant-[A-Za-z0-9-_]{95}", "keyPrefix": "sk-ant-", "baseUrl": "https://api.anthropic.com", "authType": "header", "headerName": "x-api-key", "testEndpoint": "/v1/messages"}'),
+('gemini', 'Google Gemini', 'Google Gemini AI models', 'ai_models', 'https://ai.google.dev', 'https://ai.google.dev/docs', '{"keyFormat": "AIza[A-Za-z0-9_-]{35}", "keyPrefix": "AIza", "baseUrl": "https://generativelanguage.googleapis.com", "authType": "query", "testEndpoint": "/v1/models"}'),
+('qwen', 'Qwen', 'Alibaba Cloud Qwen AI models', 'ai_models', 'https://qwen.ai', 'https://api-docs.deepseek.com', '{"keyFormat": "sk-[A-Za-z0-9]{32,64}", "keyPrefix": "sk-", "baseUrl": "https://dashscope.aliyuncs.com", "authType": "bearer", "testEndpoint": "/compatible-mode/v1/models"}'),
+('deepseek', 'DeepSeek', 'DeepSeek AI models and reasoning', 'ai_models', 'https://deepseek.com', 'https://api-docs.deepseek.com', '{"keyFormat": "sk-[A-Za-z0-9]{32,64}", "keyPrefix": "sk-", "baseUrl": "https://api.deepseek.com", "authType": "bearer", "testEndpoint": "/models"}'),
+('openrouter', 'OpenRouter', 'Unified API for multiple AI models', 'ai_models', 'https://openrouter.ai', 'https://openrouter.ai/docs', '{"keyFormat": "sk-or-v1-[A-Za-z0-9]{64}", "keyPrefix": "sk-or-v1-", "baseUrl": "https://openrouter.ai/api/v1", "authType": "bearer", "testEndpoint": "/models"}'),
+('groq', 'Groq', 'Fast inference for LLMs and AI models', 'ai_models', 'https://groq.com', 'https://console.groq.com/docs', '{"keyFormat": "gsk_[A-Za-z0-9]{52}", "keyPrefix": "gsk_", "baseUrl": "https://api.groq.com/openai/v1", "authType": "bearer", "testEndpoint": "/models"}'),
+('elevenlabs', 'ElevenLabs', 'AI voice generation and text-to-speech', 'audio', 'https://elevenlabs.io', 'https://elevenlabs.io/docs', '{"keyFormat": "[A-Za-z0-9]{32}", "keyPrefix": "", "baseUrl": "https://api.elevenlabs.io/v1", "authType": "header", "headerName": "xi-api-key", "testEndpoint": "/models"}'),
+('tavily', 'Tavily', 'AI-powered web search and research', 'search', 'https://tavily.com', 'https://docs.tavily.com', '{"keyFormat": "tvly-[A-Za-z0-9]{32,64}", "keyPrefix": "tvly-", "baseUrl": "https://api.tavily.com", "authType": "bearer", "testEndpoint": "/usage"}');
+
+-- Insert default AI models
+INSERT INTO public.ai_models (name, display_name, provider, description, cost_per_token, max_tokens, capabilities) VALUES
+('gpt-4o', 'GPT-4o', 'openai', 'OpenAI GPT-4o model', 0.00003, 128000, '["text", "code", "reasoning"]'),
+('gpt-4o-mini', 'GPT-4o Mini', 'openai', 'OpenAI GPT-4o Mini model', 0.00000015, 128000, '["text", "code"]'),
+('claude-3-5-sonnet-20241022', 'Claude 3.5 Sonnet', 'claude', 'Anthropic Claude 3.5 Sonnet', 0.000003, 200000, '["text", "code", "reasoning", "vision"]'),
+('claude-3-5-haiku-20241022', 'Claude 3.5 Haiku', 'claude', 'Anthropic Claude 3.5 Haiku', 0.00000025, 200000, '["text", "code"]'),
+('gemini-1.5-pro', 'Gemini 1.5 Pro', 'gemini', 'Google Gemini 1.5 Pro', 0.00000125, 2000000, '["text", "code", "vision", "multimodal"]'),
+('gemini-1.5-flash', 'Gemini 1.5 Flash', 'gemini', 'Google Gemini 1.5 Flash', 0.000000075, 1000000, '["text", "code", "vision"]'),
+('qwen-max', 'Qwen Max', 'qwen', 'Alibaba Qwen Max model', 0.000002, 32000, '["text", "code", "reasoning"]'),
+('qwen-plus', 'Qwen Plus', 'qwen', 'Alibaba Qwen Plus model', 0.0000007, 32000, '["text", "code"]'),
+('deepseek-chat', 'DeepSeek Chat', 'deepseek', 'DeepSeek Chat model', 0.00000014, 64000, '["text", "code", "reasoning"]'),
+('deepseek-coder', 'DeepSeek Coder', 'deepseek', 'DeepSeek Coder model', 0.00000014, 64000, '["code", "programming"]'),
+('llama-3.1-70b-versatile', 'Llama 3.1 70B', 'groq', 'Meta Llama 3.1 70B model on Groq', 0.00000059, 131072, '["text", "code", "reasoning"]'),
+('llama-3.1-8b-instant', 'Llama 3.1 8B', 'groq', 'Meta Llama 3.1 8B model on Groq', 0.00000005, 131072, '["text", "code"]'),
+('mixtral-8x7b-32768', 'Mixtral 8x7B', 'groq', 'Mixtral 8x7B model on Groq', 0.00000024, 32768, '["text", "code"]');
+
+-- Insert default AI provider configs
+INSERT INTO public.ai_provider_configs (provider, base_url, configuration) VALUES
+('openai', 'https://api.openai.com/v1', '{"defaultModel": "gpt-4o-mini", "supportedModels": ["gpt-4o", "gpt-4o-mini"]}'),
+('claude', 'https://api.anthropic.com', '{"defaultModel": "claude-3-5-haiku-20241022", "supportedModels": ["claude-3-5-sonnet-20241022", "claude-3-5-haiku-20241022"]}'),
+('gemini', 'https://generativelanguage.googleapis.com', '{"defaultModel": "gemini-1.5-flash", "supportedModels": ["gemini-1.5-pro", "gemini-1.5-flash"]}'),
+('qwen', 'https://dashscope.aliyuncs.com', '{"defaultModel": "qwen-plus", "supportedModels": ["qwen-max", "qwen-plus"]}'),
+('deepseek', 'https://api.deepseek.com', '{"defaultModel": "deepseek-chat", "supportedModels": ["deepseek-chat", "deepseek-coder"]}'),
+('openrouter', 'https://openrouter.ai/api/v1', '{"defaultModel": "openai/gpt-4o-mini", "supportedModels": ["openai/gpt-4o", "anthropic/claude-3-5-sonnet", "google/gemini-pro"]}'),
+('groq', 'https://api.groq.com/openai/v1', '{"defaultModel": "llama-3.1-8b-instant", "supportedModels": ["llama-3.1-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768"]}'),
+('elevenlabs', 'https://api.elevenlabs.io/v1', '{"defaultModel": "eleven_multilingual_v2", "supportedModels": ["eleven_multilingual_v2", "eleven_turbo_v2"]}'),
+('tavily', 'https://api.tavily.com', '{"defaultModel": "tavily-search", "supportedModels": ["tavily-search", "tavily-extract"]}');
+
 -- Indexes for Performance
 CREATE INDEX idx_users_email ON public.users(email);
 CREATE INDEX idx_users_username ON public.users(username);
@@ -457,3 +497,12 @@ CREATE INDEX idx_user_sessions_user_id ON public.user_sessions(user_id);
 CREATE INDEX idx_user_sessions_token ON public.user_sessions(session_token);
 CREATE INDEX idx_user_sessions_active ON public.user_sessions(is_active);
 CREATE INDEX idx_user_sessions_expires_at ON public.user_sessions(expires_at);
+
+-- Additional indexes for API key management
+CREATE INDEX idx_api_keys_user_id ON public.api_keys(user_id);
+CREATE INDEX idx_api_keys_provider ON public.api_keys(provider);
+CREATE INDEX idx_api_keys_is_active ON public.api_keys(is_active);
+CREATE INDEX idx_api_key_providers_provider ON public.api_key_providers(provider);
+CREATE INDEX idx_api_key_providers_category ON public.api_key_providers(category);
+CREATE INDEX idx_ai_models_provider ON public.ai_models(provider);
+CREATE INDEX idx_ai_provider_configs_provider ON public.ai_provider_configs(provider);

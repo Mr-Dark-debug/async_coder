@@ -44,6 +44,11 @@ class Settings(BaseSettings):
     cors_allow_methods: List[str] | str = Field(default=["*"], env="CORS_ALLOW_METHODS")
     cors_allow_headers: List[str] | str = Field(default=["*"], env="CORS_ALLOW_HEADERS")
 
+    # Database Configuration
+    database_url: str = Field(..., env="DATABASE_URL")
+    supabase_anon_key: str = Field(..., env="SUPABASE_ANON_KEY")
+    supabase_public_key: str = Field(..., env="SUPABASE_PUBLIC_KEY")
+
     # Groq API Configuration (Required)
     groq_api_key: str = Field(..., env="GROQ_API_KEY")
     groq_base_url: str = Field(
@@ -160,9 +165,9 @@ class Settings(BaseSettings):
         """Check if application is running in production."""
         return self.environment.lower() == "production"
 
-    def get_database_url(self) -> Optional[str]:
-        """Get database URL if needed (placeholder for future use)."""
-        return None
+    def get_database_url(self) -> str:
+        """Get database URL."""
+        return self.database_url
 
 
 @lru_cache()

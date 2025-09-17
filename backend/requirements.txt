@@ -10,6 +10,7 @@ pydantic-settings
 python-dotenv
 
 httpx
+supabase
 
 aiofiles
 
