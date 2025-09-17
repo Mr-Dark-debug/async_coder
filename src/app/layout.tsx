@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -75,6 +76,16 @@ export default function RootLayout({
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
           {children}
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              style: {
+                background: 'rgb(23 23 23)',
+                border: '1px solid rgb(64 64 64)',
+                color: 'white',
+              },
+            }}
+          />
         </body>
       </html>
     </ClerkProvider>

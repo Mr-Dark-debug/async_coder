@@ -25,6 +25,8 @@ import actionConfig from "@/json/action-config.json";
 import sidebarData from "@/json/sidebar-data.json";
 import { toast } from "sonner";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
+
 type TranscriptionResult = {
     message?: string;
     detail?: string;
@@ -101,6 +103,8 @@ export function VercelV0Chat() {
     const [recordingDuration, setRecordingDuration] = useState(0);
     const [isTranscribing, setIsTranscribing] = useState(false);
     const [recordingError, setRecordingError] = useState<string | null>(null);
+    const [isCanceling, setIsCanceling] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
     const voiceInputRef = useRef<AIVoiceInputHandle>(null);
     const { textareaRef, adjustHeight } = useAutoResizeTextarea({
         minHeight: 60,
@@ -155,20 +159,52 @@ export function VercelV0Chat() {
         setIsTranscribing(false);
     };
 
+    const handleCancelRecording = async () => {
+        console.log("Cancel button clicked");
+        setIsCanceling(true);
+        try {
+            // Stop recording if it's still active
+            if (voiceInputRef.current) {
+                await voiceInputRef.current.stopRecording({ discard: true });
+            }
+            
+            // Reset all recording states and close the recording UI
+            setIsRecording(false);
+            setRecordingBlob(null);
+            setRecordingDuration(0);
+            setRecordingError(null);
+            setIsTranscribing(false);
+            
+            toast.success("Recording cancelled");
+            console.log("Recording cancelled successfully");
+        } catch (error) {
+            console.error("Error cancelling recording:", error);
+            toast.error("Failed to cancel recording");
+        } finally {
+            setIsCanceling(false);
+        }
+    };
+
     const handleSaveRecording = async () => {
-        if (isRecording) {
-            toast.error("Stop the recording before finishing.");
+        console.log("Done button clicked", { isRecording, recordingBlob, isSaving, isCanceling });
+        
+        if (!recordingBlob) {
+            console.log("No recording blob available");
+            toast.error("No recording found to transcribe");
             return;
         }
 
-        if (!recordingBlob) {
-            toast.error("Record a message before finishing.");
+        if (isSaving || isCanceling) {
+            console.log("Already processing or canceling");
             return;
         }
 
         try {
+            setIsSaving(true);
             setIsTranscribing(true);
-
+            
+            console.log("Sending recording to API...");
+            
             const extension = recordingBlob.type.includes("ogg")
                 ? "ogg"
                 : recordingBlob.type.includes("mp4") || recordingBlob.type.includes("mpeg")
@@ -185,24 +221,19 @@ export function VercelV0Chat() {
                 body: formData,
             });
 
-            let result: TranscriptionResult | null = null;
-            try {
-                result = (await response.json()) as TranscriptionResult;
-            } catch {
-                result = null;
+            console.log("API Response status:", response.status);
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error("API Error:", errorText);
+                throw new Error(`API request failed with status ${response.status}`);
             }
 
-            if (!response.ok) {
-                const message =
-                    result?.message ||
-                    result?.detail ||
-                    "Failed to transcribe audio.";
-                throw new Error(message);
-            }
+            const result = await response.json() as TranscriptionResult;
+            console.log("API Response:", result);
 
             const data = result?.data;
-            let transcriptionText =
-                typeof data?.text === "string" ? data.text : "";
+            let transcriptionText = typeof data?.text === "string" ? data.text : "";
 
             const segments = Array.isArray(data?.segments)
                 ? (data?.segments as Array<{ text?: string }>)
@@ -217,33 +248,31 @@ export function VercelV0Chat() {
 
             if (transcriptionText) {
                 setValue(transcriptionText);
-                toast.success("Transcription ready.");
+                toast.success("Transcription complete!");
+                // Close the recording UI after successful transcription
+                setIsRecording(false);
+                setRecordingBlob(null);
+                setRecordingDuration(0);
+                setRecordingError(null);
+                console.log("Transcription successful, recording UI closed");
+                // Focus the textarea after a short delay
+                setTimeout(() => {
+                    textareaRef.current?.focus();
+                    adjustHeight();
+                }, 100);
             } else {
-                toast.info("Transcription completed, but no text was returned.");
+                toast.info("No speech detected in the recording.");
+                console.log("No speech detected in recording");
             }
-
-            setIsRecording(false);
-            setRecordingBlob(null);
-            setRecordingDuration(0);
-            setRecordingError(null);
-            setTimeout(() => adjustHeight(), 0);
-            textareaRef.current?.focus();
         } catch (error) {
+            console.error("Transcription failed:", error);
             const message =
-                error instanceof Error ? error.message : "Failed to transcribe audio.";
-            toast.error(message);
+                error instanceof Error ? error.message : "Failed to transcribe audio";
+            toast.error(`Transcription failed: ${message}`);
         } finally {
+            setIsSaving(false);
             setIsTranscribing(false);
         }
-    };
-
-    const handleCancelRecording = () => {
-        voiceInputRef.current?.stopRecording({ discard: true });
-        setIsRecording(false);
-        setRecordingBlob(null);
-        setRecordingDuration(0);
-        setRecordingError(null);
-        setIsTranscribing(false);
     };
 
     const handleActionClick = (actionId: string) => {
@@ -279,25 +308,33 @@ export function VercelV0Chat() {
                         <AIVoiceInput
                             ref={voiceInputRef}
                             onStart={() => {
+                                console.log("Recording started");
                                 setRecordingError(null);
                                 setRecordingBlob(null);
                                 setIsRecording(true);
                             }}
                             onStop={(duration, blob) => {
-                                setIsRecording(false);
+                                console.log("Recording stopped", { duration, blobSize: blob?.size });
+                                // Don't set isRecording to false here - keep the recording UI open
+                                // The recording UI should stay open to show Cancel/Done buttons
+                                
                                 if (blob && blob.size > 0) {
                                     setRecordingBlob(blob);
                                     setRecordingDuration(duration);
                                     setRecordingError(null);
+                                    console.log("Recording completed successfully - recording UI remains open for review");
                                 } else {
                                     setRecordingBlob(null);
                                     setRecordingDuration(0);
                                     const message = "We couldn't capture any audio. Please try recording again.";
                                     setRecordingError(message);
                                     toast.error(message);
+                                    console.log("Recording failed - no audio captured");
                                 }
                             }}
                             onError={(error) => {
+                                console.log("Recording error", error);
+                                // Keep the recording UI to show the error and allow retry
                                 setIsRecording(false);
                                 setRecordingBlob(null);
                                 const message = error?.message || "Recording failed.";
@@ -319,40 +356,48 @@ export function VercelV0Chat() {
                         )}
 
                         {/* Recording Controls */}
-                        <div className="flex items-center justify-between mt-4 pt-4 border-t border-dotted border-neutral-600">
-                            {/* Left side - Paperclip icon */}
-                            <div className="flex items-center">
-                                <button
-                                    type="button"
-                                    className="p-2 hover:bg-neutral-800 rounded-lg transition-colors"
-                                >
-                                    <Paperclip className="w-5 h-5 text-neutral-400 hover:text-white transition-colors" />
-                                </button>
-                            </div>
-                            
-                            {/* Right side - Cancel and Done buttons */}
+                        <div className="flex items-center justify-end mt-4 pt-4 border-t border-neutral-800">
                             <div className="flex items-center gap-3">
                                 <button
                                     type="button"
                                     onClick={handleCancelRecording}
-                                    className="flex items-center gap-2 px-4 py-2 text-neutral-400 hover:text-white transition-colors"
+                                    disabled={isCanceling || isSaving}
+                                    className={cn(
+                                        "flex items-center justify-center gap-2 px-4 py-2 text-neutral-400 hover:text-white transition-colors",
+                                        "disabled:opacity-50 disabled:cursor-not-allowed min-w-[100px]"
+                                    )}
                                 >
-                                    <X className="w-4 h-4" />
-                                    <span className="text-sm font-medium">Cancel</span>
+                                    {isCanceling ? (
+                                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                                    ) : (
+                                        <X className="w-4 h-4" />
+                                    )}
+                                    <span className="text-sm font-medium">
+                                        {isCanceling ? "Canceling..." : "Cancel"}
+                                    </span>
                                 </button>
                                 
                                 <button
                                     type="button"
-                                    onClick={() => void handleSaveRecording()}
-                                    disabled={isTranscribing || isRecording || !recordingBlob}
+                                    onClick={handleSaveRecording}
+                                    disabled={isCanceling || isSaving || !recordingBlob}
                                     className={cn(
-                                        "flex items-center gap-2 px-4 py-2 rounded-lg text-white transition-all duration-200 bg-neutral-700 hover:bg-neutral-600",
-                                        "disabled:opacity-50 disabled:pointer-events-none"
+                                        "flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 min-w-[100px]",
+                                        isSaving 
+                                            ? "bg-neutral-600 text-white cursor-wait"
+                                            : recordingBlob 
+                                                ? "bg-white text-black hover:bg-neutral-100 cursor-pointer"
+                                                : "bg-neutral-700 text-neutral-400 cursor-not-allowed",
+                                        "disabled:cursor-not-allowed"
                                     )}
                                 >
-                                    <Check className="w-4 h-4" />
+                                    {isSaving ? (
+                                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                                    ) : (
+                                        <Check className="w-4 h-4" />
+                                    )}
                                     <span className="text-sm font-medium">
-                                        {isTranscribing ? "Transcribing..." : "Done"}
+                                        {isSaving ? "Processing..." : "Done"}
                                     </span>
                                 </button>
                             </div>

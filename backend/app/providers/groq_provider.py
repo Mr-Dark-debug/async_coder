@@ -176,10 +176,10 @@ class GroqProvider:
             # Write file content
             with open(temp_path, 'wb') as temp_file:
                 temp_file.write(file_content)
-            
+        
             logger.debug(f"Temporary file saved: {temp_path}")
             return temp_path
-            
+        
         except Exception as e:
             logger.error(f"Failed to save temporary file: {e}")
             raise GroqAPIError(
@@ -187,7 +187,45 @@ class GroqProvider:
                 error_code="FILE_SAVE_ERROR",
                 details={"original_error": str(e)}
             )
-    
+
+    def _save_permanent_file(self, file_content: bytes, filename: str, request_id: str) -> Path:
+        """
+        Save uploaded file content to a permanent location for storage/debugging.
+        
+        Args:
+            file_content: Binary content of the file
+            filename: Original filename  
+            request_id: Unique request identifier
+            
+        Returns:
+            Path: Path to the permanent file
+        """
+        try:
+            # Create recordings directory if it doesn't exist
+            recordings_dir = Path(self.settings.upload_dir) / "recordings"
+            recordings_dir.mkdir(exist_ok=True)
+            
+            # Generate filename with request ID and timestamp
+            file_extension = Path(filename).suffix
+            timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+            permanent_name = f"{timestamp}_{request_id[:8]}{file_extension}"
+            permanent_path = recordings_dir / permanent_name
+            
+            # Write file content
+            with open(permanent_path, 'wb') as perm_file:
+                perm_file.write(file_content)
+        
+            logger.debug(f"Permanent file saved: {permanent_path}")
+            return permanent_path
+        
+        except Exception as e:
+            logger.error(f"Failed to save permanent file: {e}")
+            raise GroqAPIError(
+                message=f"Failed to save permanent file: {str(e)}",
+                error_code="FILE_SAVE_ERROR",
+                details={"original_error": str(e)}
+            )
+
     def _cleanup_temp_file(self, file_path: Path) -> None:
         """
         Remove temporary file from disk.
@@ -217,14 +255,39 @@ class GroqProvider:
             TranscriptionData: Standardized transcription data
         """
         try:
-            # Handle different response formats
+            # Log the response for debugging
+            logger.debug(f"Processing Groq response type: {type(response)}")
+            
+            # Handle different response types
+            if isinstance(response, str):
+                # Simple text response
+                return TranscriptionData(
+                    task=task,
+                    language='unknown' if task == 'transcribe' else 'en',
+                    duration=None,
+                    text=response,
+                    words=None,
+                    segments=None
+                )
+            
+            # Handle Groq response objects
             if hasattr(response, 'model_dump'):
                 data = response.model_dump()
             elif hasattr(response, 'dict'):
                 data = response.dict()
+            elif hasattr(response, '__dict__'):
+                data = response.__dict__
             else:
                 # Fallback for basic response with just text
-                data = {"text": getattr(response, 'text', str(response))}
+                text = getattr(response, 'text', str(response))
+                return TranscriptionData(
+                    task=task,
+                    language='unknown' if task == 'transcribe' else 'en',
+                    duration=None,
+                    text=text,
+                    words=None,
+                    segments=None
+                )
             
             # Extract basic fields
             text = data.get('text', '')
@@ -285,6 +348,7 @@ class GroqProvider:
             
         except Exception as e:
             logger.error(f"Failed to convert Groq response: {e}")
+            logger.error(f"Response data: {locals().get('data', 'Not available')}")
             raise GroqAPIError(
                 message=f"Failed to process API response: {str(e)}",
                 error_code="RESPONSE_PROCESSING_ERROR",
@@ -325,11 +389,18 @@ class GroqProvider:
             
             # Save to temporary file
             temp_file_path = self._save_temp_file(file_content, filename)
-            
+
+            # Also save a permanent copy for debugging/storage
+            try:
+                permanent_path = self._save_permanent_file(file_content, filename, request_id)
+                logger.info(f"Audio file saved permanently: {permanent_path}")
+            except Exception as e:
+                logger.warning(f"Failed to save permanent audio file: {e}")
+
             # Prepare transcription parameters
             transcription_params = {
                 "model": request.model,
-                "response_format": request.response_format.value,
+                "response_format": request.response_format,  # Use enum directly
                 "temperature": request.temperature or 0.0
             }
             
@@ -342,7 +413,7 @@ class GroqProvider:
             
             if request.timestamp_granularities:
                 transcription_params["timestamp_granularities"] = [
-                    tg.value for tg in request.timestamp_granularities
+                    str(tg) for tg in request.timestamp_granularities  # Convert enum to string
                 ]
             
             # Open file and make API request
@@ -368,7 +439,7 @@ class GroqProvider:
                     "file_size_bytes": file_metadata.file_size,
                     "audio_format": Path(filename).suffix.lower().lstrip('.'),
                     "language_requested": request.language,
-                    "response_format": request.response_format.value,
+                    "response_format": str(request.response_format),  # Convert enum to string for metadata
                     "temperature": request.temperature,
                     "prompt_provided": bool(request.prompt)
                 },
@@ -455,7 +526,7 @@ class GroqProvider:
             # Prepare translation parameters
             translation_params = {
                 "model": request.model,
-                "response_format": request.response_format.value,
+                "response_format": request.response_format,  # Use enum directly
                 "temperature": request.temperature or 0.0
             }
             
@@ -485,7 +556,7 @@ class GroqProvider:
                     "model_used": request.model,
                     "file_size_bytes": file_metadata.file_size,
                     "audio_format": Path(filename).suffix.lower().lstrip('.'),
-                    "response_format": request.response_format.value,
+                    "response_format": str(request.response_format),  # Convert enum to string for metadata
                     "temperature": request.temperature,
                     "prompt_provided": bool(request.prompt),
                     "target_language": "en"

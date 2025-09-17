@@ -4,7 +4,7 @@ Handles file uploads and communicates with Groq API provider.
 """
 
 import logging
-from typing import Optional
+from typing import Optional, Union
 from datetime import datetime
 
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Depends, status
@@ -238,17 +238,17 @@ async def transcribe_audio(
         
         status_code = status_code_map.get(e.error_code, 500)
         
-        return JSONResponse(
+        raise HTTPException(
             status_code=status_code,
-            content=error_response.dict()
+            detail=error_response.model_dump(mode='json')
         )
     except Exception as e:
         logger.error(f"Unexpected error during transcription: {e}", exc_info=True)
         error_response = create_error_response(e, default_message="Transcription failed")
         
-        return JSONResponse(
+        raise HTTPException(
             status_code=500,
-            content=error_response.dict()
+            detail=error_response.model_dump(mode='json')
         )
 
 
@@ -357,17 +357,17 @@ async def translate_audio(
         
         status_code = status_code_map.get(e.error_code, 500)
         
-        return JSONResponse(
+        raise HTTPException(
             status_code=status_code,
-            content=error_response.dict()
+            detail=error_response.model_dump(mode='json')
         )
     except Exception as e:
         logger.error(f"Unexpected error during translation: {e}", exc_info=True)
         error_response = create_error_response(e, default_message="Translation failed")
         
-        return JSONResponse(
+        raise HTTPException(
             status_code=500,
-            content=error_response.dict()
+            detail=error_response.model_dump(mode='json')
         )
 
 
@@ -438,9 +438,9 @@ async def health_check(
         if overall_status == "healthy":
             return response
         else:
-            return JSONResponse(
+            raise HTTPException(
                 status_code=503,
-                content=response.dict()
+                detail=response.dict()
             )
             
     except Exception as e:
@@ -455,14 +455,15 @@ async def health_check(
             }
         )
         
-        return JSONResponse(
+        raise HTTPException(
             status_code=503,
-            content=error_response.dict()
+            detail=error_response.dict()
         )
 
 
 @router.get(
     "/models",
+    response_model=None,
     summary="List available models",
     description="Get a list of available Whisper models for transcription and translation"
 )
@@ -489,9 +490,9 @@ async def list_models(
         }
     except Exception as e:
         logger.error(f"Failed to list models: {e}")
-        return JSONResponse(
+        raise HTTPException(
             status_code=500,
-            content={
+            detail={
                 "success": False,
                 "message": f"Failed to retrieve models: {str(e)}",
                 "timestamp": datetime.utcnow()
@@ -501,6 +502,7 @@ async def list_models(
 
 @router.get(
     "/formats",
+    response_model=None,
     summary="List supported audio formats",
     description="Get a list of supported audio file formats"
 )
@@ -522,9 +524,9 @@ async def list_supported_formats(
         }
     except Exception as e:
         logger.error(f"Failed to list formats: {e}")
-        return JSONResponse(
+        raise HTTPException(
             status_code=500,
-            content={
+            detail={
                 "success": False,
                 "message": f"Failed to retrieve formats: {str(e)}",
                 "timestamp": datetime.utcnow()
