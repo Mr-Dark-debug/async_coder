@@ -4,6 +4,7 @@ import { useEffect, useRef, useCallback } from "react";
 import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { AIVoiceInput } from "@/components/ui/ai-voice-input";
+import type { AIVoiceInputHandle } from "@/components/ui/ai-voice-input";
 import { cn } from "@/lib/utils";
 import {
     ArrowUpIcon,
@@ -22,6 +23,16 @@ import {
 } from "lucide-react";
 import actionConfig from "@/json/action-config.json";
 import sidebarData from "@/json/sidebar-data.json";
+import { toast } from "sonner";
+
+type TranscriptionResult = {
+    message?: string;
+    detail?: string;
+    data?: {
+        text?: string;
+        segments?: Array<{ text?: string }>;
+    };
+};
 
 interface UseAutoResizeTextareaProps {
     minHeight: number;
@@ -86,7 +97,11 @@ export function VercelV0Chat() {
     const [showRepoDropdown, setShowRepoDropdown] = useState(false);
     const [showBranchDropdown, setShowBranchDropdown] = useState(false);
     const [isRecording, setIsRecording] = useState(false);
-    
+    const [recordingBlob, setRecordingBlob] = useState<Blob | null>(null);
+    const [recordingDuration, setRecordingDuration] = useState(0);
+    const [isTranscribing, setIsTranscribing] = useState(false);
+    const [recordingError, setRecordingError] = useState<string | null>(null);
+    const voiceInputRef = useRef<AIVoiceInputHandle>(null);
     const { textareaRef, adjustHeight } = useAutoResizeTextarea({
         minHeight: 60,
         maxHeight: 200,
@@ -126,18 +141,109 @@ export function VercelV0Chat() {
         };
     }, []);
 
-    const handleMicClick = () => {
-        setIsRecording(true);
+    const formatRecordedDuration = (seconds: number) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
     };
 
-    const handleSaveRecording = () => {
-        setIsRecording(false);
-        setValue(prev => prev + " [Voice recording saved]");
-        setTimeout(() => adjustHeight(), 0);
+    const handleMicClick = () => {
+        setIsRecording(true);
+        setRecordingBlob(null);
+        setRecordingDuration(0);
+        setRecordingError(null);
+        setIsTranscribing(false);
+    };
+
+    const handleSaveRecording = async () => {
+        if (isRecording) {
+            toast.error("Stop the recording before finishing.");
+            return;
+        }
+
+        if (!recordingBlob) {
+            toast.error("Record a message before finishing.");
+            return;
+        }
+
+        try {
+            setIsTranscribing(true);
+
+            const extension = recordingBlob.type.includes("ogg")
+                ? "ogg"
+                : recordingBlob.type.includes("mp4") || recordingBlob.type.includes("mpeg")
+                ? "m4a"
+                : "webm";
+
+            const formData = new FormData();
+            formData.append("file", recordingBlob, `voice-input.${extension}`);
+            formData.append("model", "whisper-large-v3-turbo");
+            formData.append("response_format", "verbose_json");
+
+            const response = await fetch(`${API_BASE_URL}/api/v1/transcribe`, {
+                method: "POST",
+                body: formData,
+            });
+
+            let result: TranscriptionResult | null = null;
+            try {
+                result = (await response.json()) as TranscriptionResult;
+            } catch {
+                result = null;
+            }
+
+            if (!response.ok) {
+                const message =
+                    result?.message ||
+                    result?.detail ||
+                    "Failed to transcribe audio.";
+                throw new Error(message);
+            }
+
+            const data = result?.data;
+            let transcriptionText =
+                typeof data?.text === "string" ? data.text : "";
+
+            const segments = Array.isArray(data?.segments)
+                ? (data?.segments as Array<{ text?: string }>)
+                : [];
+
+            if (!transcriptionText && segments.length) {
+                transcriptionText = segments
+                    .map((segment) => segment?.text ?? "")
+                    .join(" ")
+                    .trim();
+            }
+
+            if (transcriptionText) {
+                setValue(transcriptionText);
+                toast.success("Transcription ready.");
+            } else {
+                toast.info("Transcription completed, but no text was returned.");
+            }
+
+            setIsRecording(false);
+            setRecordingBlob(null);
+            setRecordingDuration(0);
+            setRecordingError(null);
+            setTimeout(() => adjustHeight(), 0);
+            textareaRef.current?.focus();
+        } catch (error) {
+            const message =
+                error instanceof Error ? error.message : "Failed to transcribe audio.";
+            toast.error(message);
+        } finally {
+            setIsTranscribing(false);
+        }
     };
 
     const handleCancelRecording = () => {
+        voiceInputRef.current?.stopRecording({ discard: true });
         setIsRecording(false);
+        setRecordingBlob(null);
+        setRecordingDuration(0);
+        setRecordingError(null);
+        setIsTranscribing(false);
     };
 
     const handleActionClick = (actionId: string) => {
@@ -170,13 +276,48 @@ export function VercelV0Chat() {
             <div className="w-full">
                 {isRecording ? (
                     <div className="relative bg-neutral-900 rounded-xl border border-neutral-800 p-6">
-                        <AIVoiceInput 
-                            onStart={() => console.log('Recording started')}
-                            onStop={(duration) => console.log('Recording stopped:', duration)}
+                        <AIVoiceInput
+                            ref={voiceInputRef}
+                            onStart={() => {
+                                setRecordingError(null);
+                                setRecordingBlob(null);
+                                setIsRecording(true);
+                            }}
+                            onStop={(duration, blob) => {
+                                setIsRecording(false);
+                                if (blob && blob.size > 0) {
+                                    setRecordingBlob(blob);
+                                    setRecordingDuration(duration);
+                                    setRecordingError(null);
+                                } else {
+                                    setRecordingBlob(null);
+                                    setRecordingDuration(0);
+                                    const message = "We couldn't capture any audio. Please try recording again.";
+                                    setRecordingError(message);
+                                    toast.error(message);
+                                }
+                            }}
+                            onError={(error) => {
+                                setIsRecording(false);
+                                setRecordingBlob(null);
+                                const message = error?.message || "Recording failed.";
+                                setRecordingError(message);
+                                toast.error(message);
+                            }}
                             visualizerBars={48}
                             className="py-0"
                         />
-                        
+
+                        {recordingBlob && !recordingError && (
+                            <p className="mt-2 text-xs text-neutral-400">
+                                Recorded {formatRecordedDuration(recordingDuration)} of audio.
+                            </p>
+                        )}
+
+                        {recordingError && (
+                            <p className="mt-2 text-xs text-red-400">{recordingError}</p>
+                        )}
+
                         {/* Recording Controls */}
                         <div className="flex items-center justify-between mt-4 pt-4 border-t border-dotted border-neutral-600">
                             {/* Left side - Paperclip icon */}
@@ -202,11 +343,17 @@ export function VercelV0Chat() {
                                 
                                 <button
                                     type="button"
-                                    onClick={handleSaveRecording}
-                                    className="flex items-center gap-2 px-4 py-2 bg-neutral-700 hover:bg-neutral-600 rounded-lg text-white transition-all duration-200"
+                                    onClick={() => void handleSaveRecording()}
+                                    disabled={isTranscribing || isRecording || !recordingBlob}
+                                    className={cn(
+                                        "flex items-center gap-2 px-4 py-2 rounded-lg text-white transition-all duration-200 bg-neutral-700 hover:bg-neutral-600",
+                                        "disabled:opacity-50 disabled:pointer-events-none"
+                                    )}
                                 >
                                     <Check className="w-4 h-4" />
-                                    <span className="text-sm font-medium">Done</span>
+                                    <span className="text-sm font-medium">
+                                        {isTranscribing ? "Transcribing..." : "Done"}
+                                    </span>
                                 </button>
                             </div>
                         </div>
