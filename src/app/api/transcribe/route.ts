@@ -1,6 +1,4 @@
 import { NextResponse } from 'next/server';
-import { TranscriptionRequest } from '@/app/schemas/request/transcription';
-import { TranscriptionResponse } from '@/app/schemas/response/transcription';
 
 export async function POST(request: Request) {
     try {
@@ -58,12 +56,4 @@ export async function POST(request: Request) {
             { status: 500 }
         );
     }
-}
-
-// Add TypeScript type for the request body
-type TranscribeRequest = {
-    file: File;
-    model?: string;
-    response_format?: string;
-    timestamp_granularities?: string[];
 }
