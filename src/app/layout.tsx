@@ -1,18 +1,26 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "sonner";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+const clerkPublishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+function Providers({ children }: { children: React.ReactNode }) {
+  if (!clerkPublishableKey) {
+    if (process.env.NODE_ENV !== "production") {
+      console.warn(
+        "Clerk publishable key is not configured. Authentication features are disabled for this build."
+      );
+    }
+    return <>{children}</>;
+  }
+
+  return (
+    <ClerkProvider publishableKey={clerkPublishableKey}>
+      {children}
+    </ClerkProvider>
+  );
+}
 
 export const metadata: Metadata = {
   title: "Async Coder - The last AI assistant you'll ever need for coding",
@@ -70,10 +78,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <Providers>
       <html lang="en">
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          className="antialiased"
         >
           {children}
           <Toaster
@@ -88,6 +96,6 @@ export default function RootLayout({
           />
         </body>
       </html>
-    </ClerkProvider>
+    </Providers>
   );
 }

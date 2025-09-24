@@ -4,6 +4,7 @@ Configures the application, middleware, and routing.
 """
 
 import logging
+import os
 import time
 from contextlib import asynccontextmanager
 from typing import Dict, Any
@@ -58,6 +59,12 @@ console_handler.setLevel(logging.INFO)
 log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 colored_formatter = ColoredFormatter(log_format)
 console_handler.setFormatter(colored_formatter)
+
+# Ensure the log directory exists before configuring file logging.
+# This prevents FileNotFoundError during application startup when the
+# directory hasn't been created yet (for example in fresh deployments
+# or CI environments).
+os.makedirs("logs", exist_ok=True)
 
 # Create file handler
 file_handler = logging.FileHandler('logs/app.log', mode='a', encoding='utf-8')

@@ -356,7 +356,7 @@ export function VercelV0Chat() {
                         )}
 
                         {/* Recording Controls */}
-                        <div className="flex items-center justify-end mt-4 pt-4 border-t border-neutral-800">
+                        <div className="flex flex-col items-end mt-4 pt-4 border-t border-neutral-800">
                             <div className="flex items-center gap-3">
                                 <button
                                     type="button"
@@ -401,6 +401,15 @@ export function VercelV0Chat() {
                                     </span>
                                 </button>
                             </div>
+                            {isTranscribing && (
+                                <div
+                                    className="mt-3 flex items-center gap-2 text-xs text-neutral-400"
+                                    aria-live="polite"
+                                >
+                                    <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                                    <span>Transcribing your audio…</span>
+                                </div>
+                            )}
                         </div>
                     </div>
                 ) : (

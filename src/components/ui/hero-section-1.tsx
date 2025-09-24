@@ -8,6 +8,8 @@ import { Logos3 } from '@/components/ui/logos3'
 import { cn } from '@/lib/utils'
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
 
+const isClerkConfigured = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY)
+
 const transitionVariants = {
     item: {
         hidden: {
@@ -105,33 +107,48 @@ export function HeroSection() {
                                         ...transitionVariants,
                                     }}
                                     className="mt-12 flex flex-col items-center justify-center gap-2 md:flex-row">
-                                    <SignedOut>
-                                        <div
-                                            key={1}
-                                            className="bg-foreground/10 rounded-[14px] border p-0.5">
-                                            <SignInButton mode="modal">
-                                                <LoadingButton
-                                                    size="lg"
-                                                    className="rounded-xl px-5 text-base bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                                                    <span className="text-nowrap">Get Started Now</span>
-                                                </LoadingButton>
-                                            </SignInButton>
-                                        </div>
-                                    </SignedOut>
-                                    <SignedIn>
-                                        <div
-                                            key={1}
-                                            className="bg-foreground/10 rounded-[14px] border p-0.5">
-                                            <LoadingButton
-                                                size="lg"
-                                                loading={isSignUpLoading}
-                                                loadingText="Getting Started..."
-                                                onClick={handleGetStartedClick}
-                                                className="rounded-xl px-5 text-base bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                                                <span className="text-nowrap">Go to Dashboard</span>
-                                            </LoadingButton>
-                                        </div>
-                                    </SignedIn>
+                                    {isClerkConfigured ? (
+                                        <>
+                                            <SignedOut>
+                                                <div
+                                                    key={1}
+                                                    className="bg-foreground/10 rounded-[14px] border p-0.5">
+                                                    <SignInButton mode="modal">
+                                                        <LoadingButton
+                                                            size="lg"
+                                                            className="rounded-xl px-5 text-base bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                                                            <span className="text-nowrap">Get Started Now</span>
+                                                        </LoadingButton>
+                                                    </SignInButton>
+                                                </div>
+                                            </SignedOut>
+                                            <SignedIn>
+                                                <div
+                                                    key={1}
+                                                    className="bg-foreground/10 rounded-[14px] border p-0.5">
+                                                    <LoadingButton
+                                                        size="lg"
+                                                        loading={isSignUpLoading}
+                                                        loadingText="Getting Started..."
+                                                        onClick={handleGetStartedClick}
+                                                        className="rounded-xl px-5 text-base bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                                                        <span className="text-nowrap">Go to Dashboard</span>
+                                                    </LoadingButton>
+                                                </div>
+                                            </SignedIn>
+                                        </>
+                                    ) : (
+                                        <LoadingButton
+                                            key="cta"
+                                            size="lg"
+                                            className="rounded-xl px-5 text-base bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                                            asChild
+                                        >
+                                            <Link href="#quick-start">
+                                                <span className="text-nowrap">Get Started Now</span>
+                                            </Link>
+                                        </LoadingButton>
+                                    )}
                                     <LoadingButton
                                         key={2}
                                         size="lg"
@@ -237,42 +254,77 @@ const HeroHeader = () => {
                                 </ul>
                             </div>
                             <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
-                                <SignedOut>
-                                    <SignInButton mode="modal">
+                                {isClerkConfigured ? (
+                                    <>
+                                        <SignedOut>
+                                            <SignInButton mode="modal">
+                                                <LoadingButton
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className={cn(isScrolled && 'lg:hidden')}>
+                                                    <span>Login</span>
+                                                </LoadingButton>
+                                            </SignInButton>
+                                            <SignInButton mode="modal">
+                                                <LoadingButton
+                                                    size="sm"
+                                                    className={cn(isScrolled && 'lg:hidden')}>
+                                                    <span>Sign Up</span>
+                                                </LoadingButton>
+                                            </SignInButton>
+                                        </SignedOut>
+                                        <SignedIn>
+                                            <div className={cn(isScrolled && 'lg:hidden')}>
+                                                <UserButton
+                                                    appearance={{
+                                                        elements: {
+                                                            avatarBox: "w-8 h-8"
+                                                        }
+                                                    }}
+                                                />
+                                            </div>
+                                            <LoadingButton
+                                                size="sm"
+                                                loading={isGetStartedLoading}
+                                                loadingText="Getting Started..."
+                                                onClick={handleGetStartedClick}
+                                                className={cn(isScrolled ? 'lg:inline-flex' : 'hidden')}>
+                                                <span>Go to Dashboard</span>
+                                            </LoadingButton>
+                                        </SignedIn>
+                                    </>
+                                ) : (
+                                    <>
                                         <LoadingButton
                                             variant="outline"
                                             size="sm"
-                                            className={cn(isScrolled && 'lg:hidden')}>
-                                            <span>Login</span>
+                                            className={cn(isScrolled && 'lg:hidden')}
+                                            asChild
+                                        >
+                                            <Link href="#quick-start">
+                                                <span>Quick Start</span>
+                                            </Link>
                                         </LoadingButton>
-                                    </SignInButton>
-                                    <SignInButton mode="modal">
                                         <LoadingButton
                                             size="sm"
-                                            className={cn(isScrolled && 'lg:hidden')}>
-                                            <span>Sign Up</span>
+                                            className={cn(isScrolled && 'lg:hidden')}
+                                            asChild
+                                        >
+                                            <Link href="#roadmap">
+                                                <span>View Roadmap</span>
+                                            </Link>
                                         </LoadingButton>
-                                    </SignInButton>
-                                </SignedOut>
-                                <SignedIn>
-                                    <div className={cn(isScrolled && 'lg:hidden')}>
-                                        <UserButton 
-                                            appearance={{
-                                                elements: {
-                                                    avatarBox: "w-8 h-8"
-                                                }
-                                            }}
-                                        />
-                                    </div>
-                                    <LoadingButton
-                                        size="sm"
-                                        loading={isGetStartedLoading}
-                                        loadingText="Getting Started..."
-                                        onClick={handleGetStartedClick}
-                                        className={cn(isScrolled ? 'lg:inline-flex' : 'hidden')}>
-                                        <span>Go to Dashboard</span>
-                                    </LoadingButton>
-                                </SignedIn>
+                                        <LoadingButton
+                                            size="sm"
+                                            loading={isGetStartedLoading}
+                                            loadingText="Loading..."
+                                            onClick={handleGetStartedClick}
+                                            className={cn(isScrolled ? 'lg:inline-flex' : 'hidden')}
+                                        >
+                                            <span>Explore Tasks</span>
+                                        </LoadingButton>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>
