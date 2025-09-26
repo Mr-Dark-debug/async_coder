@@ -3,16 +3,15 @@ API Key management endpoints.
 """
 
 from fastapi import APIRouter, HTTPException, Depends, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from typing import List, Dict, Any, Optional
 import logging
 from pydantic import BaseModel, Field
 
 from app.database.api_keys import APIKeyManager
 from app.services.api_key_validator import APIKeyValidationService
+from app.api.deps import get_current_user_id
 
 logger = logging.getLogger(__name__)
-security = HTTPBearer()
 
 router = APIRouter(prefix="/api-keys", tags=["api-keys"])
 
@@ -55,12 +54,6 @@ class ProviderResponse(BaseModel):
     website_url: Optional[str]
     docs_url: Optional[str]
     configuration: Dict[str, Any]
-
-def get_current_user_id(credentials: HTTPAuthorizationCredentials = Depends(security)) -> str:
-    """Extract user ID from JWT token. This is a placeholder - implement actual JWT validation."""
-    # TODO: Implement proper JWT token validation
-    # For now, return a mock user ID
-    return "mock-user-id"
 
 @router.get("/providers", response_model=List[ProviderResponse])
 async def get_providers():

@@ -15,6 +15,7 @@ from app.services.github_oauth_service import (
     GitHubOAuthService,
     GitHubOAuthStateError,
 )
+from app.api.deps import get_current_user_id
 
 
 logger = logging.getLogger(__name__)
@@ -33,7 +34,6 @@ def get_github_service(settings: Settings = Depends(get_settings)) -> GitHubOAut
 class OAuthStartRequest(BaseModel):
     """Request payload for starting the OAuth flow."""
 
-    user_id: Optional[str] = Field(default=None, description="Authenticated user identifier")
     return_url: Optional[AnyHttpUrl] = Field(
         default=None,
         description="URL to redirect back to once OAuth completes",
@@ -78,12 +78,13 @@ class GitHubConnectionStatus(BaseModel):
 @router.post("/oauth/start", response_model=OAuthStartResponse)
 async def start_github_oauth(
     payload: OAuthStartRequest,
+    user_id: str = Depends(get_current_user_id),
     service: GitHubOAuthService = Depends(get_github_service),
 ) -> OAuthStartResponse:
     """Begin the GitHub OAuth flow by generating an authorization URL."""
     try:
         authorization_url, state = service.start_authorization(
-            user_id=payload.user_id,
+            user_id=user_id,
             return_url=str(payload.return_url) if payload.return_url else None,
         )
     except GitHubOAuthConfigurationError as exc:
@@ -129,7 +130,7 @@ async def github_oauth_callback(
 
 @router.get("/oauth/status", response_model=GitHubConnectionStatus)
 async def github_connection_status(
-    user_id: str = Query(..., description="Authenticated user identifier"),
+    user_id: str = Depends(get_current_user_id),
     service: GitHubOAuthService = Depends(get_github_service),
 ) -> GitHubConnectionStatus:
     """Return the GitHub connector status for the current user."""

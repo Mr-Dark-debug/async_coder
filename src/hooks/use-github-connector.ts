@@ -102,8 +102,7 @@ export function useGitHubConnector(
 
     setLoadingStatus(true);
     try {
-      const params = new URLSearchParams({ user_id: userId });
-      const response = await fetch(`${API_BASE_URL}/github/oauth/status?${params.toString()}`, {
+      const response = await fetch(`${API_BASE_URL}/github/oauth/status`, {
         headers: {
           Accept: 'application/json',
           ...buildAuthHeaders(),
@@ -157,7 +156,6 @@ export function useGitHubConnector(
             ...buildAuthHeaders(),
           },
           body: JSON.stringify({
-            user_id: userId,
             return_url: returnTo,
           }),
         });

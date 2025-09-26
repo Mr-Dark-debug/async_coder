@@ -25,9 +25,9 @@ The server listens on `http://localhost:8000` by default and mounts all routes u
 
 | Method & Path | Description |
 | --- | --- |
-| `POST /api/v1/github/oauth/start` | Generates an authorization URL and state token for the signed-in user. |
+| `POST /api/v1/github/oauth/start` | Generates an authorization URL and state token for the signed-in user (requires `Authorization: Bearer <token>`). |
 | `GET /api/v1/github/oauth/callback` | Exchanges the GitHub `code` for tokens and redirects back to the frontend with the outcome. |
-| `GET /api/v1/github/oauth/status` | Returns the stored connection metadata for a `user_id` (connected flag, account info, scopes, timestamp). |
+| `GET /api/v1/github/oauth/status` | Returns the stored connection metadata for the authenticated caller (connected flag, account info, scopes, timestamp). |
 
 These endpoints rely on the configuration described in [`docs/github-connector.md`](../docs/github-connector.md). For production deployments replace the in-memory token storage in `GitHubOAuthService` with calls to your database or secret store.
 

@@ -74,9 +74,9 @@ The following endpoints live under `/api/v1/github`:
 
 | Method & Path | Purpose |
 | --- | --- |
-| `POST /oauth/start` | Generates a GitHub authorization URL and opaque state token. Requires `user_id` in the payload. |
+| `POST /oauth/start` | Generates a GitHub authorization URL and opaque state token. Requires an `Authorization` bearer token so the backend can resolve the caller. |
 | `GET /oauth/callback` | Handles the GitHub redirect, exchanges the `code` for an access token or installation token, and redirects back to the frontend with `github=connected` or `github=error`. |
-| `GET /oauth/status` | Returns the connection status for a given `user_id` (connected flag, account info, scopes, timestamp). |
+| `GET /oauth/status` | Returns the connection status for the authenticated caller (connected flag, account info, scopes, timestamp). |
 
 All endpoints rely on in-memory storage for demo purposes. Replace `GitHubOAuthService` with your persistence layer before shipping to production.
 
@@ -86,8 +86,8 @@ All endpoints rely on in-memory storage for demo purposes. Replace `GitHubOAuthS
 
 The **Integrations → GitHub connector** tab:
 
-1. Calls `GET /github/oauth/status` on mount when a user is signed in.
-2. Launches the GitHub OAuth flow by POSTing to `/github/oauth/start` and redirecting the browser to the returned URL.
+1. Calls `GET /github/oauth/status` on mount when a user is signed in, including the bearer token issued by Clerk (or your auth provider).
+2. Launches the GitHub OAuth flow by POSTing to `/github/oauth/start` and redirecting the browser to the returned URL, again sending the bearer token for identification.
 3. Listens for `github=connected` or `github=error` query parameters after the backend redirects back.
 4. Shows the connected account, scopes, and "Connected X minutes ago" timestamp.
 5. Links to this document so operators can review configuration steps without digging into the repository.
