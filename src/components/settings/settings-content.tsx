@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -8,16 +8,46 @@ import { GeneralTab } from './tabs/GeneralTab';
 import { EnvironmentsTab } from './tabs/EnvironmentsTab';
 import { DataControlsTab } from './tabs/DataControlsTab';
 import { CodeReviewTab } from './tabs/CodeReviewTab';
+import { IntegrationsTab } from './tabs/IntegrationsTab';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 const settingsTabs = [
   { id: 'general', label: 'General', component: GeneralTab },
   { id: 'environments', label: 'Environments', component: EnvironmentsTab },
+  { id: 'integrations', label: 'Integrations', component: IntegrationsTab },
   { id: 'data-controls', label: 'Data controls', component: DataControlsTab },
   { id: 'code-review', label: 'Code review', component: CodeReviewTab },
 ];
 
 export function SettingsContent() {
   const [activeTab, setActiveTab] = useState('general');
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  useEffect(() => {
+    const tabFromQuery = searchParams?.get('tab');
+    if (!tabFromQuery) {
+      return;
+    }
+
+    const isValidTab = settingsTabs.some((tab) => tab.id === tabFromQuery);
+    if (isValidTab) {
+      setActiveTab(tabFromQuery);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (!router) return;
+
+    const currentTab = searchParams?.get('tab');
+    if (currentTab === activeTab) {
+      return;
+    }
+
+    const params = new URLSearchParams(searchParams?.toString());
+    params.set('tab', activeTab);
+    router.replace(`?${params.toString()}`);
+  }, [activeTab, router, searchParams]);
 
   const ActiveComponent = settingsTabs.find(tab => tab.id === activeTab)?.component || GeneralTab;
 

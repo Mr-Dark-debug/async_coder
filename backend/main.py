@@ -19,7 +19,7 @@ from fastapi.exceptions import RequestValidationError
 import uvicorn
 
 from app.core.config import get_settings
-from app.api.v1.endpoints.transcription import router as transcription_router
+from app.api.v1 import api_router
 from app.providers.groq_provider import GroqAPIError
 
 # Configure logging with colors
@@ -381,11 +381,7 @@ async def basic_health_check() -> Dict[str, Any]:
 
 
 # Include API routers
-app.include_router(
-    transcription_router,
-    prefix=settings.api_v1_prefix,
-    tags=["Audio Transcription"]
-)
+app.include_router(api_router, prefix=settings.api_v1_prefix)
 
 
 # Custom startup message

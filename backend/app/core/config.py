@@ -31,6 +31,12 @@ class Settings(BaseSettings):
     port: int = Field(default=8000, env="PORT")
     api_v1_prefix: str = Field(default="/api/v1", env="API_V1_PREFIX")
 
+    # Frontend configuration
+    frontend_base_url: str = Field(
+        default="http://localhost:3000",
+        env="FRONTEND_BASE_URL",
+    )
+
     # Security Configuration
     secret_key: str = Field(
         default="your-secret-key-here-change-in-production",
@@ -70,6 +76,30 @@ class Settings(BaseSettings):
     available_models: List[str] | str = Field(
         default=["whisper-large-v3-turbo", "whisper-large-v3"],
         env="AVAILABLE_MODELS",
+    )
+
+    # GitHub OAuth Configuration
+    github_app_id: Optional[str] = Field(default=None, env="GITHUB_APP_ID")
+    github_client_id: Optional[str] = Field(default=None, env="GITHUB_CLIENT_ID")
+    github_client_secret: Optional[str] = Field(default=None, env="GITHUB_CLIENT_SECRET")
+    github_private_key: Optional[str] = Field(default=None, env="GITHUB_PRIVATE_KEY")
+    github_webhook_secret: Optional[str] = Field(default=None, env="GITHUB_WEBHOOK_SECRET")
+    github_redirect_uri: Optional[str] = Field(default=None, env="GITHUB_REDIRECT_URI")
+    github_authorize_url: str = Field(
+        default="https://github.com/login/oauth/authorize",
+        env="GITHUB_AUTHORIZE_URL",
+    )
+    github_token_url: str = Field(
+        default="https://github.com/login/oauth/access_token",
+        env="GITHUB_TOKEN_URL",
+    )
+    github_api_base_url: str = Field(
+        default="https://api.github.com",
+        env="GITHUB_API_BASE_URL",
+    )
+    github_oauth_scopes: List[str] | str = Field(
+        default=["repo", "read:org"],
+        env="GITHUB_OAUTH_SCOPES",
     )
 
     # Logging Configuration
@@ -118,6 +148,7 @@ class Settings(BaseSettings):
         "cors_allow_headers",
         "allowed_audio_formats",
         "available_models",
+        "github_oauth_scopes",
         mode="before",
     )
     def parse_list_fields(cls, value: Any) -> List[str]:

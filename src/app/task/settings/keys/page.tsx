@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,12 +8,17 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
-import { Search, Plus, Key, Zap, Cloud, Code, MessageSquare, BarChart3, Settings } from 'lucide-react';
+import { Search, Plus, Key, Zap, Cloud, Code, MessageSquare, BarChart3, Settings, Github } from 'lucide-react';
 import { useAPIKeys, type APIKeyProvider } from '@/hooks/use-api-keys';
 import { APIKeyForm } from '@/components/settings/api-key-form';
 import { APIKeyList } from '@/components/settings/api-key-list';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { useUser } from '@clerk/nextjs';
+import { toast } from 'sonner';
+
+import { useGitHubConnector } from '@/hooks/use-github-connector';
 
 const categoryIcons = {
   ai_models: Zap,
@@ -41,6 +46,39 @@ export default function KeyManagementPage() {
   const [selectedProvider, setSelectedProvider] = useState<APIKeyProvider | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string>('all');
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const { user } = useUser();
+  const {
+    startConnection: startGitHubConnection,
+    connecting: githubConnecting,
+  } = useGitHubConnector(user?.id, { autoFetch: false });
+
+  useEffect(() => {
+    const githubStatus = searchParams?.get('github');
+    if (!githubStatus) {
+      return;
+    }
+
+    const errorCode = searchParams?.get('error');
+
+    if (githubStatus === 'connected') {
+      toast.success('GitHub account connected.');
+    } else if (githubStatus === 'error') {
+      toast.error(errorCode ? 'GitHub authorization failed.' : 'GitHub authorization was cancelled.');
+    }
+
+    router.replace('/task/settings/keys');
+  }, [router, searchParams]);
+
+  const handleGitHubConnect = () => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const returnUrl = `${window.location.origin}/task/settings/keys?github=connected`;
+    startGitHubConnection({ returnTo: returnUrl });
+  };
 
   // Filter providers based on search query
   const filteredProviders = providers.filter(provider =>
@@ -162,6 +200,8 @@ export default function KeyManagementPage() {
           <ProvidersGrid
             providers={getProvidersForCategory(activeCategory)}
             onAddKey={handleAddKey}
+            onGitHubConnect={handleGitHubConnect}
+            githubConnecting={githubConnecting}
           />
         </TabsContent>
       </Tabs>
@@ -191,9 +231,11 @@ export default function KeyManagementPage() {
 interface ProvidersGridProps {
   providers: APIKeyProvider[];
   onAddKey: (provider: APIKeyProvider) => void;
+  onGitHubConnect: () => void;
+  githubConnecting: boolean;
 }
 
-function ProvidersGrid({ providers, onAddKey }: ProvidersGridProps) {
+function ProvidersGrid({ providers, onAddKey, onGitHubConnect, githubConnecting }: ProvidersGridProps) {
   const { getAPIKeysByProvider } = useAPIKeys();
 
   if (providers.length === 0) {
@@ -215,6 +257,8 @@ function ProvidersGrid({ providers, onAddKey }: ProvidersGridProps) {
       {providers.map((provider) => {
         const userKeys = getAPIKeysByProvider(provider.provider);
         const hasKeys = userKeys.length > 0;
+        const providerSlug = provider.provider?.toLowerCase?.() ?? '';
+        const isGitHubProvider = providerSlug === 'github';
 
         return (
           <Card key={provider.id} className="relative group hover:shadow-md transition-shadow">
@@ -250,7 +294,16 @@ function ProvidersGrid({ providers, onAddKey }: ProvidersGridProps) {
                 {provider.description}
               </CardDescription>
 
-              {hasKeys ? (
+              {isGitHubProvider ? (
+                <Button
+                  className="w-full gap-2"
+                  onClick={onGitHubConnect}
+                  disabled={githubConnecting}
+                >
+                  <Github className="w-4 h-4" />
+                  {githubConnecting ? 'Opening GitHub...' : 'Connect GitHub'}
+                </Button>
+              ) : hasKeys ? (
                 <APIKeyList provider={provider} onAddKey={() => onAddKey(provider)} />
               ) : (
                 <Button
@@ -261,6 +314,12 @@ function ProvidersGrid({ providers, onAddKey }: ProvidersGridProps) {
                   <Plus className="w-4 h-4 mr-2" />
                   Add {provider.displayName} Key
                 </Button>
+              )}
+
+              {isGitHubProvider && (
+                <p className="text-xs text-muted-foreground">
+                  Opens GitHub&apos;s Install &amp; Authorize page in a new tab. Once approved, the Async Coder backend completes the OAuth exchange and stores the installation token for this account.
+                </p>
               )}
 
               {provider.docsUrl && (
