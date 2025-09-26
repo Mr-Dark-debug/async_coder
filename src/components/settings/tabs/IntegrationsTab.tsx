@@ -31,6 +31,10 @@ import {
 
 import { useGitHubConnector } from "@/hooks/use-github-connector";
 
+const docsLink =
+  process.env.NEXT_PUBLIC_GITHUB_CONNECTOR_DOCS ??
+  "https://github.com/your-org/async-coder/blob/main/docs/github-connector.md";
+
 const ENVIRONMENT_VARIABLES = [
   {
     key: "GITHUB_APP_ID",
@@ -191,6 +195,14 @@ export function IntegrationsTab() {
         <p className="text-sm text-neutral-300 max-w-3xl">
           Async Coder now guides people straight to GitHub&apos;s Install &amp; Authorize flow so every team member can connect their repositories without confusing pop-ups. The integration follows OpenAI&apos;s Model Context Protocol (MCP) playbook for custom connectors, keeping authentication simple and secure.
         </p>
+        <div>
+          <Button asChild variant="outline" className="gap-2 border-neutral-700 text-sm text-neutral-200 hover:bg-neutral-800">
+            <Link href={docsLink} target="_blank" rel="noopener noreferrer">
+              Open the full setup guide
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </Button>
+        </div>
       </header>
 
       <Card className="bg-neutral-900 border-neutral-800">
@@ -317,7 +329,7 @@ export function IntegrationsTab() {
         <CardHeader>
           <CardTitle className="text-white">Environment variables</CardTitle>
           <CardDescription className="text-neutral-300">
-            Configure these secrets so the backend can negotiate OAuth with GitHub and expose the connector to ChatGPT.
+            Configure these secrets (see <code className="mx-1 rounded bg-neutral-800 px-1.5 py-0.5 text-xs">backend/.env.example</code> and <code className="mx-1 rounded bg-neutral-800 px-1.5 py-0.5 text-xs">.env.local.example</code>) so the backend can negotiate OAuth with GitHub and expose the connector to ChatGPT.
           </CardDescription>
         </CardHeader>
         <CardContent>

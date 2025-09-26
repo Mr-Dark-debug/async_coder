@@ -3,7 +3,8 @@ API v1 router configuration.
 """
 
 from fastapi import APIRouter
-from .endpoints import transcription, api_keys, github
+
+from .endpoints import api_keys, github, transcription
 
 api_router = APIRouter()
 

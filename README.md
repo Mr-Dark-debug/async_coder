@@ -198,6 +198,17 @@ OPENAI_API_KEY=your_openai_key_here
 5. Use voice input or text to interact
 6. Connect your repositories and select branches
 
+### **5. Connect GitHub via MCP**
+
+The GitHub connector lets ChatGPT (or other MCP-compatible clients) talk to your repositories using OAuth. Follow the dedicated [GitHub connector setup guide](docs/github-connector.md) and the new environment samples (`backend/.env.example`, `.env.local.example`) to:
+
+- Register a GitHub App with the correct callback URL.
+- Populate the Async Coder backend with your GitHub credentials.
+- Launch the **Authorize with GitHub** flow directly from **Settings → Integrations** without intermediary pop-ups.
+- Verify connection status and scopes inside the dashboard.
+
+Once connected, update your MCP discovery document so ChatGPT can call the connector endpoints exposed by the FastAPI backend.
+
 **CLI Mode (Coming Soon):**
 ```bash
 # Launch interactive mode
